@@ -1,0 +1,19 @@
+services:
+  db:
+      image: postgres:17
+      environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=mydatabase
+      ports:
+      - "5432:25432"
+  api-server:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    ports:
+      - "8090:8099"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/mydatabase
+    depends_on:
+      - db
