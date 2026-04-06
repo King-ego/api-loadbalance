@@ -1,0 +1,75 @@
+name: main.yml
+
+on:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  docker:
+    name: CI Docker Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Copiar .env.example para .env
+        run: cp .env.example .env
+
+      - name: Subir Docker Compose
+        run: docker compose -f docker-compose.yml up -d --build
+
+      - name: Aguardar servicos subirem
+        run: |
+          echo "Aguardando containers iniciarem..."
+          sleep 20
+
+      - name: Verificar containers ativos
+        run: |
+          EXPECTED=2
+          CONTAINER_COUNT=$(docker compose ps --services --status running | wc -l)
+          echo "Containers ativos: $CONTAINER_COUNT"
+          if [ "$CONTAINER_COUNT" -ne "$EXPECTED" ]; then
+            echo "Esperado $EXPECTED containers, encontrados $CONTAINER_COUNT"
+            docker compose ps
+            exit 1
+          fi
+          echo "Containers esperados estao ativos"
+
+      - name: Testar rota HTTP
+        run: |
+          echo "Aguardando aplicacao responder..."
+          sleep 20
+
+          for i in {1..12}; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8090/health || true)
+            if [ "$CODE" != "000" ]; then
+              echo "Aplicacao respondeu em /health com status: $CODE"
+              exit 0
+            fi
+
+            CODE_ROOT=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8090/ || true)
+            if [ "$CODE_ROOT" != "000" ]; then
+              echo "Aplicacao respondeu em / com status: $CODE_ROOT"
+              exit 0
+            fi
+
+            echo "Tentativa $i/12 - aguardando..."
+            sleep 10
+          done
+
+          echo "Servico nao respondeu a tempo"
+          exit 1
+
+      - name: Logs em caso de falha
+        if: failure()
+        run: |
+          echo "=== LOGS DB ==="
+          docker compose logs db
+          echo "=== LOGS API ==="
+          docker compose logs api-server
+
+      - name: Encerrar stack
+        if: always()
+        run: docker compose down -v
