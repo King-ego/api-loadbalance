@@ -4,10 +4,11 @@ services:
     ports:
       - "27017:27017"
     healthcheck:
-      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD-SHELL", "mongosh --quiet --eval \"db.adminCommand('ping')\" > /dev/null 2>&1" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 20s
   db:
       image: postgres:17
       environment:
@@ -26,9 +27,10 @@ services:
         context: .
         dockerfile: Dockerfile
     ports:
-      - "8090:8099"
+      - "8090:8090"
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/mydatabase
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/balance
     depends_on:
       db:
         condition: service_healthy
