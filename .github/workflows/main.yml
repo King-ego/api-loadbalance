@@ -27,7 +27,7 @@ jobs:
 
       - name: Verificar containers ativos
         run: |
-          EXPECTED=2
+          EXPECTED=7
           CONTAINER_COUNT=$(docker compose ps --services --status running | wc -l)
           echo "Containers ativos: $CONTAINER_COUNT"
           if [ "$CONTAINER_COUNT" -ne "$EXPECTED" ]; then
