@@ -44,13 +44,13 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - api-server-1
+      - api-server-2
+      - api-server-3
   api-server-1:
     build:
         context: .
         dockerfile: Dockerfile
     container_name: api-server-1
-    ports:
-      - "8090:8090"
     environment:
       DB_WRITE_URL: ${DB_WRITE_URL}
       DB_READ_1_URL: ${DB_READ_1_URL}
@@ -66,8 +66,6 @@ services:
         context: .
         dockerfile: Dockerfile
     container_name: api-server-2
-    ports:
-      - "8091:8090"
     environment:
       DB_WRITE_URL: ${DB_WRITE_URL}
       DB_READ_1_URL: ${DB_READ_1_URL}
@@ -83,8 +81,6 @@ services:
         context: .
         dockerfile: Dockerfile
     container_name: api-server-3
-    ports:
-      - "8092:8090"
     environment:
       DB_WRITE_URL: ${DB_WRITE_URL}
       DB_READ_1_URL: ${DB_READ_1_URL}
