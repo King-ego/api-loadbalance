@@ -68,7 +68,7 @@ jobs:
           echo "=== LOGS DB ==="
           docker compose logs db
           echo "=== LOGS API ==="
-          docker compose logs api-server
+          docker compose logs api-server-1
 
       - name: Encerrar stack
         if: always()
