@@ -1,9 +1,19 @@
 package com.load.balance.configs;
 
+import com.load.balance.enums.DataSourceType;
+
 public class DataSourceContextHolder {
-    private enum DataSourceType {
-        WRITE, READ_1, READ_2
+    private static final ThreadLocal<DataSourceType> contextHolder = new ThreadLocal<>();
+
+    public static void setDataSourceType(DataSourceType dataSourceType) {
+        contextHolder.set(dataSourceType);
     }
 
-    private static final ThreadLocal<DataSourceType> contextHolder = new ThreadLocal<>();
+    public static DataSourceType getDataSourceType() {
+        return contextHolder.get();
+    }
+
+    public static void clear() {
+        contextHolder.remove();
+    }
 }
