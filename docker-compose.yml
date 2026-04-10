@@ -94,3 +94,4 @@ services:
     depends_on:
       primary-db:
         condition: service_healthy
+
