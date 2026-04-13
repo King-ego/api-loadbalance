@@ -13,7 +13,7 @@ services:
       - primary_data:/var/lib/postgresql/data
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 10s
@@ -33,7 +33,7 @@ services:
     command: >
       bash -c "/init-replica.sh && postgres"
     ports:
-      - "5432:25431"
+      - "5434:5432"
     depends_on:
       primary-db:
         condition: service_healthy
@@ -52,7 +52,7 @@ services:
     command: >
       bash -c "/init-replica.sh && postgres"
     ports:
-      - "5432:25433"
+      - "5435:5432"
     depends_on:
       primary-db:
         condition: service_healthy
