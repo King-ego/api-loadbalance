@@ -1,8 +1,13 @@
 #!/bin/bash
-# Aguarda o primário estar pronto
-until pg_basebackup -h primary-db -U replicator -D "$PGDATA" -Fp -Xs -P -R; do
-    echo "Aguardando o primary-db..."
-    sleep 2
-done
+set -e
 
-echo "Replicação configurada com sucesso!"
+if [ -z "$(ls -A ${PGDATA})" ]; then
+    echo "Iniciando pg_basebackup do primary..."
+    until pg_basebackup -h primary-db -U replicator -D "${PGDATA}" -Fp -Xs -P -R; do
+        echo "primary-db não está pronto, tentando novamente em 2s..."
+        sleep 2
+    done
+    echo "pg_basebackup concluído!"
+fi
+
+exec gosu postgres postgres -D "${PGDATA}"
