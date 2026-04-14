@@ -30,8 +30,7 @@ services:
     volumes:
       - ./postgres/replica/init-replica.sh:/init-replica.sh
       - replica1_data:/var/lib/postgresql/data
-    command: >
-      bash -c "/init-replica.sh && postgres"
+    command: bash /init-replica.sh
     ports:
       - "5434:5432"
     depends_on:
@@ -49,8 +48,7 @@ services:
     volumes:
       - ./postgres/replica/init-replica.sh:/init-replica.sh
       - replica2_data:/var/lib/postgresql/data
-    command: >
-      bash -c "/init-replica.sh && postgres"
+    command: bash /init-replica.sh
     ports:
       - "5435:5432"
     depends_on:
