@@ -75,7 +75,16 @@ services:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
 
-
+  grafana:
+    image: grafana/grafana:11.0.0
+    container_name: grafana
+    ports:
+      - "3500:3000"
+    environment:
+        GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
+        GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+    depends_on:
+      - loki
 
   api-server-1:
     build:
