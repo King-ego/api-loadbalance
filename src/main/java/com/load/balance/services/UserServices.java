@@ -1,5 +1,6 @@
 package com.load.balance.services;
 
+import com.load.balance.application.returns.users.SingleUser;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,9 @@ public class UserServices {
     }
 
     @Transactional(readOnly = true)
-    public void getUserByUsername(String username) {
+    public SingleUser getUserByUsername(String username) {
         System.out.println("Fetching user by username: " + username);
-         // Placeholder for actual user retrieval logic
+        Users user = this.userRepository.findByUsername(username);
+        return SingleUser.from(user);
     }
 }
