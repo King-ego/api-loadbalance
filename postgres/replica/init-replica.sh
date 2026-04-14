@@ -10,4 +10,8 @@ if [ -z "$(ls -A ${PGDATA})" ]; then
     echo "pg_basebackup concluído!"
 fi
 
+
+chown -R postgres:postgres "${PGDATA}"
+chmod 700 "${PGDATA}"
+
 exec gosu postgres postgres -D "${PGDATA}"
