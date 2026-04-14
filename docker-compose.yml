@@ -68,6 +68,15 @@ services:
       - api-server-2
       - api-server-3
 
+  loki:
+    image: grafana/loki:3.0.0
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+
+
   api-server-1:
     build:
         context: .
