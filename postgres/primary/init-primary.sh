@@ -1,0 +1,3 @@
+#!/bin/bash
+
+psql -U "$POSTGRES_USER" -c "CREATE USER replicator WITH REPLICATION ENCRYPTED PASSWORD 'replicator_pass';"
