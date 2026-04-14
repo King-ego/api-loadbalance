@@ -6,6 +6,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      REPLICATOR_PASS: ${REPLICATOR_PASS}
     volumes:
       - ./postgres/primary/postgresql.conf:/etc/postgresql/postgresql.conf
       - ./postgres/primary/pg_hba.conf:/etc/postgresql/pg_hba.conf
@@ -26,7 +27,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      PGPASSWORD: replicator_pass
+      PGPASSWORD: ${REPLICATOR_PASS}
     volumes:
       - ./postgres/replica/init-replica.sh:/init-replica.sh
       - replica1_data:/var/lib/postgresql/data
@@ -44,7 +45,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      PGPASSWORD: replicator_pass
+      PGPASSWORD: ${REPLICATOR_PASS}
     volumes:
       - ./postgres/replica/init-replica.sh:/init-replica.sh
       - replica2_data:/var/lib/postgresql/data
