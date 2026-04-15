@@ -2,12 +2,12 @@
 set -e
 
 if [ -z "$(ls -A ${PGDATA})" ]; then
-    echo "Iniciando pg_basebackup do primary..."
+    echo "Start pg_basebackup of primary database..."
     until pg_basebackup -h primary-db -U replicator -D "${PGDATA}" -Fp -Xs -P -R; do
-        echo "primary-db não está pronto, tentando novamente em 2s..."
+        echo "primary database not ready, try again in 2s..."
         sleep 2
     done
-    echo "pg_basebackup concluído!"
+    echo "pg_basebackup completed!"
 fi
 
 
