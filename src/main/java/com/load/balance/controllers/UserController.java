@@ -1,7 +1,6 @@
 package com.load.balance.controllers;
 
 import com.load.balance.application.returns.users.SingleUser;
-import com.load.balance.models.Users;
 import com.load.balance.services.UserServices;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +24,6 @@ public class UserController {
 
     @GetMapping
     public SingleUser getUserName() {
-        Users user = this.userService.getUserByUsername("TED");
-        return SingleUser.from(user);
+        return this.userService.getUserByUsername("TED");
     }
 }
