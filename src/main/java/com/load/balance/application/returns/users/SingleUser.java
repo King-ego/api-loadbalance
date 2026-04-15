@@ -1,4 +1,22 @@
 package com.load.balance.application.returns.users;
 
-public record SingleUser() {
+import com.load.balance.models.Users;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+public record SingleUser(
+    UUID id,
+    String username,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt
+) {
+    public static  SingleUser from(Users users) {
+        return new SingleUser(
+                users.getId(),
+                users.getUsername(),
+                LocalDateTime.now(),
+                LocalDateTime.now());
+    }
+
 }
