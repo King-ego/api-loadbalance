@@ -20,6 +20,34 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  pgbouncer:
+    image: pgbouncer/pgbouncer:1.15.0
+    container_name: pgbouncer
+    dns:
+      - 127.0.0.11
+    dns_search:
+      - .
+    environment:
+      DATABASES_HOST: primary-db
+      DATABASES_PORT: 5432
+      DATABASES_DBNAME: ${POSTGRES_DB}
+      DATABASES_USER: ${POSTGRES_USER}
+      DATABASES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: 1000
+      PGBOUNCER_DEFAULT_POOL_SIZE: 30
+    ports:
+      - "5436:6432"
+    depends_on:
+      primary-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 6432 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   postgres-replica1:
     image: postgres:17
     container_name: postgres-replica-1
@@ -104,6 +132,8 @@ services:
     depends_on:
       primary-db:
         condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
 
   api-server-2:
     build:
@@ -120,6 +150,8 @@ services:
     depends_on:
       primary-db:
         condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
 
   api-server-3:
     build:
@@ -135,6 +167,8 @@ services:
       SERVER_PORT: ${SERVER_PORT}
     depends_on:
       primary-db:
+        condition: service_healthy
+      pgbouncer:
         condition: service_healthy
 
 volumes:
