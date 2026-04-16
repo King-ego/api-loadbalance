@@ -49,6 +49,10 @@ public class DataSourceConfig {
         ds.setConnectionTimeout(30_000);
         ds.setIdleTimeout(600_000);
         ds.setMaxLifetime(1_800_000);
+
+        ds.addDataSourceProperty("preparedStatementCacheQueries", "0");
+        ds.setConnectionInitSql("DEALLOCATE ALL");
+
         return ds;
     }
 
