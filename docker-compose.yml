@@ -106,6 +106,22 @@ services:
       - loki_data:/loki
     command: -config.file=/etc/loki/local-config.yaml
 
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: prometheus
+    ports:
+      - "9093:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=15d"
+    depends_on:
+      - api-server-1
+      - api-server-2
+      - api-server-3
+
   grafana:
     image: grafana/grafana:11.0.0
     container_name: grafana
@@ -128,7 +144,6 @@ services:
       DB_READ_2_URL: ${DB_READ_2_URL}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      SERVER_PORT: ${SERVER_PORT}
     depends_on:
       primary-db:
         condition: service_healthy
@@ -146,7 +161,6 @@ services:
       DB_READ_2_URL: ${DB_READ_2_URL}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      SERVER_PORT: ${SERVER_PORT}
     depends_on:
       primary-db:
         condition: service_healthy
@@ -164,7 +178,6 @@ services:
       DB_READ_2_URL: ${DB_READ_2_URL}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      SERVER_PORT: ${SERVER_PORT}
     depends_on:
       primary-db:
         condition: service_healthy
@@ -176,3 +189,4 @@ volumes:
   replica1_data:
   replica2_data:
   loki_data:
+  prometheus_data:
