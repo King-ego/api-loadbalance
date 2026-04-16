@@ -1,11 +1,9 @@
 package com.load.balance.controllers;
 
+import com.load.balance.application.dtos.users.CreateUserDto;
 import com.load.balance.application.returns.users.SingleUser;
 import com.load.balance.services.UserServices;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -17,8 +15,8 @@ public class UserController {
     }
 
     @PostMapping
-    public void createUser() {
-        String username = "TED";
+    public void createUser(@RequestBody CreateUserDto createUserDto) {
+        String username = createUserDto.getFirstName();
         this.userService.createUser(username);
     }
 
