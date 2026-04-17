@@ -6,27 +6,30 @@ import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServices {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private static final Logger log = LoggerFactory.getLogger(UserServices.class);
 
-    public UserServices(UserRepository userRepository) {
+    public UserServices(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = false)
     public void createUser(CreateUserDto createUserDto) {
         Users user = Users.builder()
-                .username(createUserDto.getFirstName())
-                .password("Ted")
+                .username(createUserDto.getUsername())
+                .password(passwordEncoder.encode(createUserDto.getPassword()))
                 .build();
 
         this.userRepository.save(user);
-        log.info("User created: {}", createUserDto.getFirstName());
+        log.info("User created: {}", createUserDto.getUsername());
     }
 
     @Transactional(readOnly = true)
