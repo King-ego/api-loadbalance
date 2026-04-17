@@ -11,7 +11,9 @@ export default function () {
     firstName: `User${__VU}-${__ITER}`,
   });
 
-  const res = http.post('http://localhost:8099/users', payload, {
+  const apiPathTarget = 'http://localhost:8099/users';
+
+  const res = http.post(apiPathTarget, payload, {
     headers: { 'Content-Type': 'application/json' },
   });
 
