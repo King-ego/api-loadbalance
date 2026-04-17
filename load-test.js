@@ -8,7 +8,7 @@ export const options = {
 
 export default function () {
   const payload = JSON.stringify({
-    firstName: `User${__VU}-${__ITER}`,
+    username: `User${__VU}-${__ITER}`,
     password: `User${__VU}-${__ITER}`
   });
 
