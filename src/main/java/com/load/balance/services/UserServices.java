@@ -1,5 +1,6 @@
 package com.load.balance.services;
 
+import com.load.balance.application.dtos.users.CreateUserDto;
 import com.load.balance.application.returns.users.SingleUser;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
@@ -18,14 +19,14 @@ public class UserServices {
     }
 
     @Transactional(readOnly = false)
-    public void createUser(String name) {
+    public void createUser(CreateUserDto createUserDto) {
         Users user = Users.builder()
-                .username(name)
+                .username(createUserDto.getFirstName())
                 .password("Ted")
                 .build();
 
         this.userRepository.save(user);
-        log.info("User created: {}", name);
+        log.info("User created: {}", createUserDto.getFirstName());
     }
 
     @Transactional(readOnly = true)
