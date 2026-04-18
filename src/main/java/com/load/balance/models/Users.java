@@ -23,6 +23,9 @@ public class Users {
     private String username;
     private String password;
 
+    @Column(unique = true)
+    private String email;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
