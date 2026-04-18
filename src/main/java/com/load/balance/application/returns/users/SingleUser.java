@@ -18,5 +18,4 @@ public record SingleUser(
                 LocalDateTime.now(),
                 LocalDateTime.now());
     }
-
 }
