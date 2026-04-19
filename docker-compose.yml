@@ -1,22 +1,22 @@
 services:
-  etcd:
-    image: quay.io/coreos/etcd:v3.5.9
-    container_name: etcd
+  primary-db:
+    image: postgres:17
+    container_name: primary-db
     environment:
-      ETCD_NAME: etcd
-      ETCD_DATA_DIR: /etcd-data
-      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
-      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
-      ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
-      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd:2380
-      ETCD_INITIAL_CLUSTER: etcd=http://etcd:2380
-      ETCD_INITIAL_CLUSTER_STATE: new
-    ports:
-      - "2379:2379"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      REPLICATOR_PASS: ${REPLICATOR_PASS}
     volumes:
-      - etcd_data:/bitnami/etcd
+      - ./postgres/primary/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgres/primary/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./postgres/primary/init-primary.sh:/docker-entrypoint-initdb.d/init-primary.sh
+      - primary_data:/var/lib/postgresql/data
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    ports:
+      - "5433:5432"
     healthcheck:
-      test: ["CMD", "etcdctl", "endpoint", "health"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,8 +29,8 @@ services:
     dns_search:
       - .
     environment:
-      DATABASES_HOST: haproxy
-      DATABASES_PORT: 5000
+      DATABASES_HOST: primary-db
+      DATABASES_PORT: 5432
       DATABASES_DBNAME: ${POSTGRES_DB}
       DATABASES_USER: ${POSTGRES_USER}
       DATABASES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -40,7 +40,7 @@ services:
     ports:
       - "5436:6432"
     depends_on:
-      haproxy:
+      primary-db:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 6432 || exit 1"]
@@ -48,105 +48,41 @@ services:
       timeout: 3s
       retries: 5
 
-  patroni-1:
-      build:
-        context: .
-        dockerfile: Dockerfile.patroni
-      container_name: patroni-1
-      environment:
-        POSTGRES_USER: ${POSTGRES_USER}
-        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        POSTGRES_DB: ${POSTGRES_DB}
-        REPLICATOR_PASS: ${REPLICATOR_PASS}
-      volumes:
-        - ./postgres/patroni/patroni-1.yml:/etc/patroni/patroni.yml
-        - patroni1_data:/data/patroni
-      command: /etc/patroni/patroni.yml
-      ports:
-        - "5433:5432"
-        - "8011:8008"
-      depends_on:
-        etcd:
-            condition: service_healthy
-      healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
-        interval: 10s
-        timeout: 5s
-        retries: 5
-
-  patroni-2:
-    build:
-      context: .
-      dockerfile: Dockerfile.patroni
-    container_name: patroni-2
+  postgres-replica1:
+    image: postgres:17
+    container_name: postgres-replica-1
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      REPLICATOR_PASS: ${REPLICATOR_PASS}
+      PGPASSWORD: ${REPLICATOR_PASS}
     volumes:
-      - ./postgres/patroni/patroni-2.yml:/etc/patroni/patroni.yml
-      - patroni2_data:/data/patroni
-    command: /etc/patroni/patroni.yml
+      - ./postgres/replica/init-replica.sh:/init-replica.sh
+      - replica1_data:/var/lib/postgresql/data
+    command: bash /init-replica.sh
     ports:
       - "5434:5432"
-      - "8012:8008"
     depends_on:
-      etcd:
+      primary-db:
         condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8008/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
-  patroni-3:
-    build:
-      context: .
-      dockerfile: Dockerfile.patroni
-    container_name: patroni-3
+  postgres-replica2:
+    image: postgres:17
+    container_name: postgres-replica-2
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      REPLICATOR_PASS: ${REPLICATOR_PASS}
+      PGPASSWORD: ${REPLICATOR_PASS}
     volumes:
-      - ./postgres/patroni/patroni-3.yml:/etc/patroni/patroni.yml
-      - patroni3_data:/data/patroni
-    command: /etc/patroni/patroni.yml
+      - ./postgres/replica/init-replica.sh:/init-replica.sh
+      - replica2_data:/var/lib/postgresql/data
+    command: bash /init-replica.sh
     ports:
       - "5435:5432"
-      - "8013:8008"
     depends_on:
-      etcd:
+      primary-db:
         condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8008/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-
-  haproxy:
-    image: haproxy:2.9
-    container_name: haproxy
-    ports:
-      - "5000:5000"   # escrita → sempre o primary atual
-      - "5001:5001"   # leitura → replicas
-      - "7000:7000"   # dashboard de stats
-    volumes:
-      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
-    depends_on:
-      patroni-1:
-        condition: service_healthy
-      patroni-2:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "haproxy", "-c", "-f", "/usr/local/etc/haproxy/haproxy.cfg" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
 
   nginx:
     image: nginx:1.29
@@ -192,15 +128,15 @@ services:
     ports:
       - "3500:3000"
     environment:
-        GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
-        GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
     depends_on:
       - loki
 
   api-server-1:
     build:
-        context: .
-        dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile
     container_name: api-server-1
     environment:
       DB_WRITE_URL: ${DB_WRITE_URL}
@@ -209,15 +145,15 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
-      haproxy:
+      primary-db:
         condition: service_healthy
       pgbouncer:
         condition: service_healthy
 
   api-server-2:
     build:
-        context: .
-        dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile
     container_name: api-server-2
     environment:
       DB_WRITE_URL: ${DB_WRITE_URL}
@@ -226,15 +162,15 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
-      haproxy:
+      primary-db:
         condition: service_healthy
       pgbouncer:
         condition: service_healthy
 
   api-server-3:
     build:
-        context: .
-        dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile
     container_name: api-server-3
     environment:
       DB_WRITE_URL: ${DB_WRITE_URL}
@@ -243,15 +179,14 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
-      haproxy:
+      primary-db:
         condition: service_healthy
       pgbouncer:
         condition: service_healthy
 
 volumes:
-  etcd_data:
-  patroni1_data:
-  patroni2_data:
-  patroni3_data:
+  primary_data:
+  replica1_data:
+  replica2_data:
   loki_data:
   prometheus_data:
