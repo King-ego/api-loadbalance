@@ -9,7 +9,8 @@ export const options = {
 export default function () {
   const payload = JSON.stringify({
     username: `User${__VU}-${__ITER}`,
-    password: `User${__VU}-${__ITER}`
+    password: `User${__VU}-${__ITER}`,
+    email: `User${__VU}-${__ITER}@gmail.com`
   });
 
   const apiPathTarget = 'http://localhost:8099/users';
