@@ -26,6 +26,7 @@ public class UserServices {
         Users user = Users.builder()
                 .username(createUserDto.getUsername())
                 .password(passwordEncoder.encode(createUserDto.getPassword()))
+                .email(createUserDto.getEmail())
                 .build();
 
         this.userRepository.save(user);
