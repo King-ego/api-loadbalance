@@ -157,10 +157,13 @@ services:
       DB_READ_2_URL: ${DB_READ_2_URL}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       primary-db:
         condition: service_healthy
       pgbouncer:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   api-server-2:
@@ -174,10 +177,13 @@ services:
       DB_READ_2_URL: ${DB_READ_2_URL}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       primary-db:
         condition: service_healthy
       pgbouncer:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   api-server-3:
@@ -191,10 +197,13 @@ services:
       DB_READ_2_URL: ${DB_READ_2_URL}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       primary-db:
         condition: service_healthy
       pgbouncer:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
 volumes:
