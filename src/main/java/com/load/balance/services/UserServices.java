@@ -6,6 +6,8 @@ import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ public class UserServices {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @CacheEvict(value = "users", allEntries = true)
     @Transactional(readOnly = false)
     public void createUser(CreateUserDto createUserDto) {
         Users user = Users.builder()
@@ -33,6 +36,7 @@ public class UserServices {
         log.info("User created: {}", createUserDto.getUsername());
     }
 
+    @Cacheable(value = "users", key = "#username")
     @Transactional(readOnly = true)
     public SingleUser getUserByUsername(String username) {
         log.info("Fetching user: {}", username);
