@@ -26,7 +26,7 @@ public class UserServices {
     }
 
     @CacheEvict(value = "users", allEntries = true)
-    @Transactional(readOnly = false)
+    @Transactional()
     public void createUser(CreateUserDto createUserDto) {
         Users user = Users.builder()
                 .username(createUserDto.getUsername())
