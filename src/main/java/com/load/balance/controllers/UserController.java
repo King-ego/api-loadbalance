@@ -5,6 +5,8 @@ import com.load.balance.application.returns.users.SingleUser;
 import com.load.balance.services.UserServices;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -19,8 +21,13 @@ public class UserController {
         this.userService.createUser(createUserDto);
     }
 
-    @GetMapping
+    @GetMapping("/username")
     public SingleUser getUserName() {
         return this.userService.getUserByUsername("TED");
+    }
+
+    @GetMapping
+    public List<SingleUser> getUsers() {
+        return this.userService.getAllUsers();
     }
 }
