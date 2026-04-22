@@ -12,7 +12,7 @@ public record SingleUser(
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) implements Serializable {
-    public static  SingleUser from(Users users) {
+    public static SingleUser from(Users users) {
         return new SingleUser(
                 users.getId(),
                 users.getUsername(),
