@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class UserServices {
     private final UserRepository userRepository;
@@ -42,5 +44,16 @@ public class UserServices {
         log.info("Fetching user: {}", username);
         Users user = this.userRepository.findByUsername(username);
         return SingleUser.from(user);
+    }
+
+    @Cacheable(value = "users", key = "'allUsers'")
+    @Transactional(readOnly = true)
+    public List<SingleUser> getAllUsers() {
+        log.info("Fetching all users");
+        List<Users> users = this.userRepository.findAll();
+
+        return users.stream()
+                .map(SingleUser::from)
+                .toList();
     }
 }
