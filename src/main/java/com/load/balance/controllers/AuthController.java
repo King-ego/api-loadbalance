@@ -41,7 +41,8 @@ public class AuthController {
         return Map.of(
                 "userId", userId,
                 "role", userRole,
-                "sessionId", session.getId()
+                "sessionId", session.getId(),
+                "email", session.getAttribute("email").toString()
         );
     }
 }
