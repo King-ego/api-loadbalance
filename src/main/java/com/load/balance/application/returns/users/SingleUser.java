@@ -9,6 +9,7 @@ import java.util.UUID;
 public record SingleUser(
     UUID id,
     String username,
+    String role,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) implements Serializable {
@@ -16,6 +17,7 @@ public record SingleUser(
         return new SingleUser(
                 users.getId(),
                 users.getUsername(),
+                users.getRole(),
                 LocalDateTime.now(),
                 LocalDateTime.now());
     }
