@@ -29,6 +29,8 @@ public class Users {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private String role;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
