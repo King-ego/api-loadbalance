@@ -5,12 +5,20 @@ import com.load.balance.application.returns.users.SingleUser;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class AuthServices {
@@ -36,9 +44,24 @@ public class AuthServices {
         }
 
 
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        user.getEmail(),
+                        null,
+                        List.of(new SimpleGrantedAuthority("MEMBER"))
+                );
+
+        SecurityContextImpl securityContext = new SecurityContextImpl(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                securityContext
+        );
         session.setAttribute("userId", user.getId().toString());
         session.setAttribute("userRole", "MEMBER");
         session.setMaxInactiveInterval(1800);
+
 
         log.info("User authenticated: {}", user.getUsername());
         return SingleUser.from(user);
