@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -18,4 +19,12 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "member_users",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<Users> members;
 }
