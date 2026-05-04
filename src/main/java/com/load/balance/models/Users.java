@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -30,6 +31,13 @@ public class Users {
     private LocalDateTime updatedAt;
 
     private String role;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+    private List<Member> companies;
 
     @PrePersist
     public void prePersist() {
