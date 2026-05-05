@@ -35,8 +35,12 @@ public class Users {
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
     private List<Company> companies;
 
-    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
-    private List<Member> members;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "company_members",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "company_id")
+    )
 
     @PrePersist
     public void prePersist() {
