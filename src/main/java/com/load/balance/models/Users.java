@@ -32,12 +32,11 @@ public class Users {
 
     private String role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id")
-    private Company company;
+    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
+    private List<Company> companies;
 
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
-    private List<Member> companies;
+    private List<Member> members;
 
     @PrePersist
     public void prePersist() {
