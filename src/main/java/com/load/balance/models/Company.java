@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Table(name = "companies")
@@ -22,4 +23,7 @@ public class Company {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id")
     private Users createdBy;
+
+    @ManyToMany(mappedBy = "memberOf", fetch = FetchType.LAZY)
+    private List<Users> members;
 }
