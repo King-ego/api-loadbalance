@@ -2,6 +2,7 @@ package com.load.balance.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,6 +17,7 @@ public class SessionConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/auth/logout", "/health", "/auth/me").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable
