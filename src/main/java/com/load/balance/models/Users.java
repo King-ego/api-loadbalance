@@ -41,6 +41,7 @@ public class Users {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "company_id")
     )
+    private List<Company> memberOf;
 
     @PrePersist
     public void prePersist() {
