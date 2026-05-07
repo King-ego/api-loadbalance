@@ -20,4 +20,9 @@ public class CompanyController {
     public List<Company> getCompanies(@RequestParam String slug, HttpSession session) {
         return this.companyServices.findBySlug(slug, session);
     }
+
+    @PostMapping
+    public Company createCompany(@RequestBody Company company, HttpSession session) {
+
+    }
 }
