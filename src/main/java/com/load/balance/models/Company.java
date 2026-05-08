@@ -1,10 +1,8 @@
 package com.load.balance.models;
 
+import com.load.balance.enums.StatusCompany;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,7 +36,7 @@ public class Company {
 
     private LocalDateTime updatedAt;
 
-    private String status;
+    private StatusCompany status;
 
     @PrePersist
     public void prePersist() {
