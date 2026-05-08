@@ -2,6 +2,9 @@ package com.load.balance.services;
 
 import com.load.balance.application.dtos.users.CreateUserDto;
 import com.load.balance.application.returns.users.SingleUser;
+import com.load.balance.application.usecase.users.CheckEmailExistsUseCase;
+import com.load.balance.application.usecase.users.CheckUsernameExistsUseCase;
+import com.load.balance.application.usecase.users.ValidatePasswordUseCase;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
 import org.slf4j.Logger;
@@ -18,19 +21,30 @@ import java.util.List;
 public class UserServices {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private static final Logger log = LoggerFactory.getLogger(UserServices.class);
+    private final CheckEmailExistsUseCase checkEmailExistsUseCase;
+    private final CheckUsernameExistsUseCase checkUsernameExistsUseCase;
+    private final ValidatePasswordUseCase validatePasswordUseCase;
 
-    public UserServices(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServices(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            CheckUsernameExistsUseCase checkUsernameExistsUseCase,
+            CheckEmailExistsUseCase checkEmailExistsUseCase,
+            ValidatePasswordUseCase validatePasswordUseCase
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.checkUsernameExistsUseCase = checkUsernameExistsUseCase;
+        this.checkEmailExistsUseCase = checkEmailExistsUseCase;
+        this.validatePasswordUseCase = validatePasswordUseCase;
     }
 
     @CacheEvict(value = "users", allEntries = true)
     @Transactional()
     public void createUser(CreateUserDto createUserDto) {
-       if (!createUserDto.getPassword().equals(createUserDto.getConfirmPassword())) {
-            throw new RuntimeException("Passwords do not match");
-        }
+        this.checkEmailExistsUseCase.notExist(createUserDto.getEmail());
+        this.checkUsernameExistsUseCase.notExist(createUserDto.getUsername());
+        this.validatePasswordUseCase.execute(createUserDto.getPassword(), createUserDto.getConfirmPassword());
 
         Users user = Users.builder()
                 .username(createUserDto.getUsername())
