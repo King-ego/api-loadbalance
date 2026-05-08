@@ -28,6 +28,10 @@ public class UserServices {
     @CacheEvict(value = "users", allEntries = true)
     @Transactional()
     public void createUser(CreateUserDto createUserDto) {
+       if (!createUserDto.getPassword().equals(createUserDto.getConfirmPassword())) {
+            throw new RuntimeException("Passwords do not match");
+        }
+
         Users user = Users.builder()
                 .username(createUserDto.getUsername())
                 .password(passwordEncoder.encode(createUserDto.getPassword()))
@@ -42,7 +46,9 @@ public class UserServices {
     @Transactional(readOnly = true)
     public SingleUser getUserByUsername(String username) {
         log.info("Fetching user: {}", username);
-        Users user = this.userRepository.findByUsername(username);
+        Users user = this.userRepository.findByUsername(username).orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
         return SingleUser.from(user);
     }
 
