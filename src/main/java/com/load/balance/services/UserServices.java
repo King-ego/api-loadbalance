@@ -7,8 +7,7 @@ import com.load.balance.application.usecase.users.CheckUsernameExistsUseCase;
 import com.load.balance.application.usecase.users.ValidatePasswordUseCase;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserServices {
     private final UserRepository userRepository;
