@@ -11,6 +11,6 @@ import java.util.UUID;
 
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, UUID> {
-    @Query("SELECT c FROM Company c JOIN c.memberOf u WHERE c.slug = :slug AND u.id = :user_id")
+    @Query("SELECT c FROM Company c JOIN c.members u WHERE c.slug = :slug AND u.id = :userId")
     List<Company> companiesBySlug(@RequestParam String slug, String userId);
 }
