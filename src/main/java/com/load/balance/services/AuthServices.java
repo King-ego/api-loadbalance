@@ -5,26 +5,27 @@ import com.load.balance.application.returns.users.SingleUser;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+/*import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;*/
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class AuthServices {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private static final Logger log = LoggerFactory.getLogger(AuthServices.class);
+    /*private static final Logger log = LoggerFactory.getLogger(AuthServices.class);*/
 
     public AuthServices(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -33,11 +34,9 @@ public class AuthServices {
 
     @Transactional(readOnly = true)
     public SingleUser authenticateDefault(CreateLoginDefault loginDefault, HttpSession session) {
-        Users user = userRepository.findByEmail(loginDefault.getEmail());
-
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
+        Users user = userRepository.findByEmail(loginDefault.getEmail()).orElseThrow(
+                ()-> new RuntimeException("User not found")
+        );
 
         if (!passwordEncoder.matches(loginDefault.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
