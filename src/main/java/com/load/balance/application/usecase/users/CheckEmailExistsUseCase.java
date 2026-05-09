@@ -13,11 +13,19 @@ public class CheckEmailExistsUseCase {
         this.userRepository = userRepository;
     }
 
-    public void execute(String email) {
+    public void exist(String email) {
         this.userRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.info("User with email {} not found", email);
                     return new RuntimeException("User not found");
+                });
+    }
+
+    public void notExist(String email) {
+        this.userRepository.findByEmail(email)
+                .ifPresent(user -> {
+                    log.info("User with email {} already exists", email);
+                    throw new RuntimeException("User already exists");
                 });
     }
 }
