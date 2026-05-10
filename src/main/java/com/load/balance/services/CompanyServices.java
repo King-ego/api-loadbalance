@@ -39,7 +39,7 @@ public class CompanyServices {
     @Transactional()
     public Company createCompany(CreateCompanyDto newCompany, HttpSession session) {
         UUID userId = (UUID) session.getAttribute("userId");
-        Users creator = this.findUserOrThrowUseCase.execute(userId);
+        Users creator = this.findUserOrThrowUseCase.byId(userId);
         String slug = this.slugGenerator.generate(newCompany.getName());
 
         Company company = Company.builder()
