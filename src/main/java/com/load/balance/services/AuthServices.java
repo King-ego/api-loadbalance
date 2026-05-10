@@ -2,6 +2,7 @@ package com.load.balance.services;
 
 import com.load.balance.application.dtos.auth.CreateLoginDefault;
 import com.load.balance.application.returns.users.SingleUser;
+import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -25,18 +26,21 @@ import java.util.List;
 public class AuthServices {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FindUserOrThrowUseCase findUserOrThrowUseCase;
     /*private static final Logger log = LoggerFactory.getLogger(AuthServices.class);*/
 
-    public AuthServices(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthServices(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            FindUserOrThrowUseCase findUserOrThrowUseCase) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.findUserOrThrowUseCase = findUserOrThrowUseCase;
     }
 
     @Transactional(readOnly = true)
     public SingleUser authenticateDefault(CreateLoginDefault loginDefault, HttpSession session) {
-        Users user = userRepository.findByEmail(loginDefault.getEmail()).orElseThrow(
-                ()-> new RuntimeException("User not found")
-        );
+        Users user = this.findUserOrThrowUseCase.byEmail(loginDefault.getEmail());
 
         if (!passwordEncoder.matches(loginDefault.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
