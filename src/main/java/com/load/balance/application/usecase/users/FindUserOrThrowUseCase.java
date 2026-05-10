@@ -16,10 +16,18 @@ public class FindUserOrThrowUseCase {
         this.userRepository = userRepository;
     }
 
-    public Users execute(UUID userId) {
+    public Users byId(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
-                    log.error("User not found");
+                    log.error("User by id not found");
+                    return new RuntimeException("User not found");
+                });
+    }
+
+    public Users byEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("User by email not found");
                     return new RuntimeException("User not found");
                 });
     }
