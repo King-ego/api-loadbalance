@@ -3,8 +3,7 @@ package com.load.balance.configs;
 import com.load.balance.enums.DataSourceType;
 
 public class DataSourceContextHolder {
-    private static final ThreadLocal<DataSourceType> contextHolder = new ThreadLocal<>();
-
+    private static final InheritableThreadLocal<DataSourceType> contextHolder = new InheritableThreadLocal<>();
     public static void setDataSourceType(DataSourceType dataSourceType) {
         contextHolder.set(dataSourceType);
     }
@@ -13,9 +12,9 @@ public class DataSourceContextHolder {
         return contextHolder.get();
     }
 
-
     public static void clear() {
         contextHolder.remove();
     }
+
 }
 
