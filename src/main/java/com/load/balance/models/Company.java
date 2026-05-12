@@ -1,5 +1,6 @@
 package com.load.balance.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.load.balance.enums.StatusCompany;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +22,7 @@ public class Company {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id")
+    @JsonBackReference
     private Users createdBy;
 
     @ManyToMany(mappedBy = "memberOf", fetch = FetchType.LAZY)
