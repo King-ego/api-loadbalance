@@ -1,5 +1,6 @@
 package com.load.balance.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,8 @@ public class Users {
     @Column(unique = true)
     private String username;
     private String name;
+
+    @JsonIgnore
     private String password;
 
     @Column(unique = true)
@@ -36,7 +39,7 @@ public class Users {
     private String role;
 
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonIgnore
     private List<Company> companies;
 
     @ManyToMany(fetch = FetchType.LAZY)
