@@ -1,4 +1,31 @@
 package com.load.balance.application.usecase.companies;
 
+import com.load.balance.models.Company;
+import com.load.balance.models.Member;
+import com.load.balance.models.Users;
+import com.load.balance.repositories.MemberRepository;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+
+@Component
 public class AddMemberAtCompany {
+    private final MemberRepository memberRepository;
+
+    public AddMemberAtCompany(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
+
+    public void execute(Company company, Users user) {
+        Member  member = Member.builder()
+                .user(user)
+                .roleInCompany("CREATOR")
+                .points(0)
+                .company(company)
+                .joinedAt(LocalDateTime.now())
+                .build();
+
+        this.memberRepository.save(member);
+    }
+
 }
