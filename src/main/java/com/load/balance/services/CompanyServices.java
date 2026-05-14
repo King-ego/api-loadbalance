@@ -4,6 +4,7 @@ import com.load.balance.application.dtos.company.CreateCompanyDTO;
 import com.load.balance.application.dtos.company.JoinCompanyDTO;
 import com.load.balance.application.shared.SlugGenerator;
 import com.load.balance.application.usecase.companies.AddMemberAtCompany;
+import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
 import com.load.balance.enums.StatusCompany;
@@ -26,25 +27,29 @@ public class CompanyServices {
     private final FindUserOrThrowUseCase findUserOrThrowUseCase;
     private final AddMemberAtCompany addMemberAtCompany;
     private final FindCompanyOrThrowUseCase findCompanyOrThrowUseCase;
+    private final CheckUserInCompanyUseCase checkUserInCompanyUseCase;
 
     public CompanyServices(
             CompanyRepository companyRepository,
             SlugGenerator slugGenerator,
             FindUserOrThrowUseCase findUserOrThrowUseCase,
             AddMemberAtCompany addMemberAtCompany,
-            FindCompanyOrThrowUseCase findCompanyOrThrowUseCase
+            FindCompanyOrThrowUseCase findCompanyOrThrowUseCase,
+            CheckUserInCompanyUseCase checkUserInCompanyUseCase
     ) {
         this.companyRepository = companyRepository;
         this.slugGenerator = slugGenerator;
         this.findUserOrThrowUseCase = findUserOrThrowUseCase;
         this.addMemberAtCompany = addMemberAtCompany;
         this.findCompanyOrThrowUseCase = findCompanyOrThrowUseCase;
+        this.checkUserInCompanyUseCase = checkUserInCompanyUseCase;
     }
 
     @Transactional(readOnly = true)
     public List<Company> findBySlug(String slug, HttpSession session) {
         String sessionUserIdStr = (String) session.getAttribute("userId");
-        return companyRepository.companiesBySlug(slug, sessionUserIdStr);
+        UUID sessionUserId = UUID.fromString(sessionUserIdStr);
+        return companyRepository.companiesBySlug(slug, sessionUserId);
     }
 
     @Transactional()
@@ -78,6 +83,9 @@ public class CompanyServices {
         this.findUserOrThrowUseCase.byId(sessionUserId);
         Users addUser = this.findUserOrThrowUseCase.byId(joinCompany.getUserId());
         Company company = this.findCompanyOrThrowUseCase.byId(joinCompany.getCompanyId());
+
+        this.checkUserInCompanyUseCase.exist(sessionUserId, joinCompany.getCompanyId());
+        this.checkUserInCompanyUseCase.notExist(joinCompany.getUserId(), joinCompany.getCompanyId());
 
         this.addMemberAtCompany.execute(company, addUser);
     }
