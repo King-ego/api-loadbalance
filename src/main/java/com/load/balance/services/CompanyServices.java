@@ -1,8 +1,10 @@
 package com.load.balance.services;
 
-import com.load.balance.application.dtos.company.CreateCompanyDto;
+import com.load.balance.application.dtos.company.CreateCompanyDTO;
+import com.load.balance.application.dtos.company.JoinCompanyDTO;
 import com.load.balance.application.shared.SlugGenerator;
 import com.load.balance.application.usecase.companies.AddMemberAtCompany;
+import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
 import com.load.balance.enums.StatusCompany;
 import com.load.balance.models.Company;
@@ -23,31 +25,34 @@ public class CompanyServices {
     private final SlugGenerator slugGenerator;
     private final FindUserOrThrowUseCase findUserOrThrowUseCase;
     private final AddMemberAtCompany addMemberAtCompany;
+    private final FindCompanyOrThrowUseCase findCompanyOrThrowUseCase;
 
     public CompanyServices(
             CompanyRepository companyRepository,
             SlugGenerator slugGenerator,
             FindUserOrThrowUseCase findUserOrThrowUseCase,
-            AddMemberAtCompany addMemberAtCompany
+            AddMemberAtCompany addMemberAtCompany,
+            FindCompanyOrThrowUseCase findCompanyOrThrowUseCase
     ) {
         this.companyRepository = companyRepository;
         this.slugGenerator = slugGenerator;
         this.findUserOrThrowUseCase = findUserOrThrowUseCase;
         this.addMemberAtCompany = addMemberAtCompany;
+        this.findCompanyOrThrowUseCase = findCompanyOrThrowUseCase;
     }
 
     @Transactional(readOnly = true)
     public List<Company> findBySlug(String slug, HttpSession session) {
-        String userId = (String) session.getAttribute("userId");
-        return companyRepository.companiesBySlug(slug, userId);
+        String sessionUserIdStr = (String) session.getAttribute("userId");
+        return companyRepository.companiesBySlug(slug, sessionUserIdStr);
     }
 
     @Transactional()
-    public Company createCompany(CreateCompanyDto newCompany, HttpSession session) {
-        String userIdStr = (String) session.getAttribute("userId");
-        UUID userId = UUID.fromString(userIdStr);
+    public Company createCompany(CreateCompanyDTO newCompany, HttpSession session) {
+        String sessionUserIdStr = (String) session.getAttribute("userId");
+        UUID sessionUserId = UUID.fromString(sessionUserIdStr);
 
-        Users creator = this.findUserOrThrowUseCase.byId(userId);
+        Users creator = this.findUserOrThrowUseCase.byId(sessionUserId);
         String slug = this.slugGenerator.generate(newCompany.getName());
 
         Company company = Company.builder()
@@ -63,6 +68,18 @@ public class CompanyServices {
         this.addMemberAtCompany.execute(createCompany, creator);
 
         return createCompany;
+    }
+
+    @Transactional()
+    public void joinCompany(JoinCompanyDTO joinCompany, HttpSession session) {
+        String sessionUserIdStr = (String) session.getAttribute("userId");
+        UUID sessionUserId = UUID.fromString(sessionUserIdStr);
+
+        this.findUserOrThrowUseCase.byId(sessionUserId);
+        Users addUser = this.findUserOrThrowUseCase.byId(joinCompany.getUserId());
+        Company company = this.findCompanyOrThrowUseCase.byId(joinCompany.getCompanyId());
+
+        this.addMemberAtCompany.execute(company, addUser);
     }
 }
 
