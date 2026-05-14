@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class CheckEmailExistsUseCase {
+public class CheckEmailUseCase {
     private final UserRepository userRepository;
 
-    public CheckEmailExistsUseCase(UserRepository userRepository) {
+    public CheckEmailUseCase(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
