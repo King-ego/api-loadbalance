@@ -2,7 +2,7 @@ package com.load.balance.services;
 
 import com.load.balance.application.dtos.users.CreateUserDto;
 import com.load.balance.application.returns.users.SingleUser;
-import com.load.balance.application.usecase.users.CheckEmailExistsUseCase;
+import com.load.balance.application.usecase.users.CheckEmailUseCase;
 import com.load.balance.application.usecase.users.CheckUsernameExistsUseCase;
 import com.load.balance.application.usecase.users.ValidatePasswordUseCase;
 import com.load.balance.models.Users;
@@ -21,7 +21,7 @@ import java.util.List;
 public class UserServices {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CheckEmailExistsUseCase checkEmailExistsUseCase;
+    private final CheckEmailUseCase checkEmailUseCase;
     private final CheckUsernameExistsUseCase checkUsernameExistsUseCase;
     private final ValidatePasswordUseCase validatePasswordUseCase;
 
@@ -29,20 +29,20 @@ public class UserServices {
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             CheckUsernameExistsUseCase checkUsernameExistsUseCase,
-            CheckEmailExistsUseCase checkEmailExistsUseCase,
+            CheckEmailUseCase checkEmailUseCase,
             ValidatePasswordUseCase validatePasswordUseCase
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.checkUsernameExistsUseCase = checkUsernameExistsUseCase;
-        this.checkEmailExistsUseCase = checkEmailExistsUseCase;
+        this.checkEmailUseCase = checkEmailUseCase;
         this.validatePasswordUseCase = validatePasswordUseCase;
     }
 
     @CacheEvict(value = "users", allEntries = true)
     @Transactional()
     public void createUser(CreateUserDto createUserDto) {
-        this.checkEmailExistsUseCase.notExist(createUserDto.getEmail());
+        this.checkEmailUseCase.notExist(createUserDto.getEmail());
         this.checkUsernameExistsUseCase.notExist(createUserDto.getUsername());
         this.validatePasswordUseCase.execute(createUserDto.getPassword(), createUserDto.getConfirmPassword());
 
