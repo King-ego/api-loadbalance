@@ -203,7 +203,7 @@ class CompanyServicesTest {
         List<Company> result = companyServices.findBySlug(slug, session);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("Test Company");
+        assertThat(result.getFirst().getName()).isEqualTo("Test Company");
     }
 
     @Test
