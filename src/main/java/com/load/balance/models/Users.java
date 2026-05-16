@@ -48,6 +48,7 @@ public class Users {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "company_id")
     )
+    @JsonIgnore
     private List<Company> memberOf;
 
     @PrePersist
