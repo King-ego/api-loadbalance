@@ -14,5 +14,5 @@ public class JoinCompanyDTO {
     @NonNull
     private UUID userId;
     @NonNull
-    private String companyId;
+    private UUID companyId;
 }
