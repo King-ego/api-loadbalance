@@ -1,6 +1,7 @@
 package com.load.balance.controllers;
 
-import com.load.balance.application.dtos.company.CreateCompanyDto;
+import com.load.balance.application.dtos.company.CreateCompanyDTO;
+import com.load.balance.application.dtos.company.JoinCompanyDTO;
 import com.load.balance.models.Company;
 import com.load.balance.services.CompanyServices;
 import jakarta.servlet.http.HttpSession;
@@ -23,7 +24,13 @@ public class CompanyController {
     }
 
     @PostMapping
-    public Company createCompany(@RequestBody CreateCompanyDto company, HttpSession session) {
+    public Company createCompany(@RequestBody CreateCompanyDTO company, HttpSession session) {
         return this.companyServices.createCompany(company, session);
+    }
+
+    @PostMapping("/join")
+    public String joinCompany(@RequestBody JoinCompanyDTO joinCompany, HttpSession session) {
+        this.companyServices.joinCompany(joinCompany, session);
+        return "Success";
     }
 }
