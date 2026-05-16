@@ -8,7 +8,7 @@ import lombok.NonNull;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCompanyDto {
+public class CreateCompanyDTO {
     @NonNull
     private String name;
 
