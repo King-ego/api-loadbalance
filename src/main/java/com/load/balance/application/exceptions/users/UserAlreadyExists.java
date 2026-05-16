@@ -1,7 +1,11 @@
 package com.load.balance.application.exceptions.users;
 
-public class UserAlreadyExists extends RuntimeException {
-    public UserAlreadyExists(String message) {
-        super(message);
+import com.load.balance.application.exceptions.base.CustomException;
+import org.springframework.http.HttpStatus;
+
+public class UserAlreadyExists extends CustomException {
+    public UserAlreadyExists() {
+        super(HttpStatus.CONFLICT, "User already exists", "User_Already_Exists");
+
     }
 }
