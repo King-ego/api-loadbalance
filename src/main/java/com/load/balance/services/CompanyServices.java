@@ -4,7 +4,7 @@ import com.load.balance.application.dtos.company.CreateCompanyDTO;
 import com.load.balance.application.dtos.company.JoinCompanyDTO;
 import com.load.balance.application.dtos.company.RemoveJoinCompanyDTO;
 import com.load.balance.application.shared.SlugGenerator;
-import com.load.balance.application.usecase.companies.AddMemberAtCompany;
+import com.load.balance.application.usecase.companies.MemberAtCompany;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
@@ -26,7 +26,7 @@ public class CompanyServices {
     private final CompanyRepository companyRepository;
     private final SlugGenerator slugGenerator;
     private final FindUserOrThrowUseCase findUserOrThrowUseCase;
-    private final AddMemberAtCompany addMemberAtCompany;
+    private final MemberAtCompany memberAtCompany;
     private final FindCompanyOrThrowUseCase findCompanyOrThrowUseCase;
     private final CheckUserInCompanyUseCase checkUserInCompanyUseCase;
 
@@ -34,14 +34,14 @@ public class CompanyServices {
             CompanyRepository companyRepository,
             SlugGenerator slugGenerator,
             FindUserOrThrowUseCase findUserOrThrowUseCase,
-            AddMemberAtCompany addMemberAtCompany,
+            MemberAtCompany memberAtCompany,
             FindCompanyOrThrowUseCase findCompanyOrThrowUseCase,
             CheckUserInCompanyUseCase checkUserInCompanyUseCase
     ) {
         this.companyRepository = companyRepository;
         this.slugGenerator = slugGenerator;
         this.findUserOrThrowUseCase = findUserOrThrowUseCase;
-        this.addMemberAtCompany = addMemberAtCompany;
+        this.memberAtCompany = memberAtCompany;
         this.findCompanyOrThrowUseCase = findCompanyOrThrowUseCase;
         this.checkUserInCompanyUseCase = checkUserInCompanyUseCase;
     }
@@ -71,7 +71,7 @@ public class CompanyServices {
 
         Company createCompany =  companyRepository.save(company);
 
-        this.addMemberAtCompany.execute(createCompany, creator);
+        this.memberAtCompany.add(createCompany, creator);
 
         return createCompany;
     }
@@ -88,7 +88,7 @@ public class CompanyServices {
         this.checkUserInCompanyUseCase.exist(sessionUserId, joinCompany.getCompanyId());
         this.checkUserInCompanyUseCase.notExist(joinCompany.getUserId(), joinCompany.getCompanyId());
 
-        this.addMemberAtCompany.execute(company, addUser);
+        this.memberAtCompany.add(company, addUser);
     }
 
     @Transactional()
@@ -97,10 +97,14 @@ public class CompanyServices {
         UUID sessionUserId = UUID.fromString(sessionUserIdStr);
 
         this.findUserOrThrowUseCase.byId(sessionUserId);
-        this.findUserOrThrowUseCase.byId(removeCompany.getUserId());
+
+        Users removeUser = this.findUserOrThrowUseCase.byId(removeCompany.getUserId());
+        Company company = this.findCompanyOrThrowUseCase.byId(removeCompany.getCompanyId());
 
         this.checkUserInCompanyUseCase.exist(sessionUserId, removeCompany.getCompanyId());
         this.checkUserInCompanyUseCase.exist(removeCompany.getUserId(), removeCompany.getCompanyId());
+
+        this.memberAtCompany.remove(company, removeUser);
 
 
     }
