@@ -1,5 +1,6 @@
 package com.load.balance.application.usecase.users;
 
+import com.load.balance.application.exceptions.users.UserNotFoundException;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ public class FindUserOrThrowUseCase {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("User by id not found");
-                    return new RuntimeException("User not found");
+                    return new UserNotFoundException();
                 });
     }
 
@@ -28,7 +29,7 @@ public class FindUserOrThrowUseCase {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.error("User by email not found");
-                    return new RuntimeException("User not found");
+                    return new UserNotFoundException();
                 });
     }
 }
