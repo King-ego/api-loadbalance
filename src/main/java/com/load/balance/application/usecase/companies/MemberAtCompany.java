@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Component
-public class AddMemberAtCompany {
+public class MemberAtCompany {
     private final MemberRepository memberRepository;
 
-    public AddMemberAtCompany(MemberRepository memberRepository) {
+    public MemberAtCompany(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 
-    public void execute(Company company, Users user) {
+    public void add(Company company, Users user) {
         Member  member = Member.builder()
                 .user(user)
                 .roleInCompany("CREATOR")
@@ -26,6 +26,10 @@ public class AddMemberAtCompany {
                 .build();
 
         this.memberRepository.save(member);
+    }
+
+    public void remove(Company company, Users user) {
+        this.memberRepository.deleteByCompanyAndUser(company, user);
     }
 
 }
