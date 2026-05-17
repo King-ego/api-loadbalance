@@ -2,6 +2,7 @@ package com.load.balance.services;
 
 import com.load.balance.application.dtos.company.CreateCompanyDTO;
 import com.load.balance.application.dtos.company.JoinCompanyDTO;
+import com.load.balance.application.dtos.company.RemoveJoinCompanyDTO;
 import com.load.balance.application.shared.SlugGenerator;
 import com.load.balance.application.usecase.companies.AddMemberAtCompany;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
@@ -88,6 +89,20 @@ public class CompanyServices {
         this.checkUserInCompanyUseCase.notExist(joinCompany.getUserId(), joinCompany.getCompanyId());
 
         this.addMemberAtCompany.execute(company, addUser);
+    }
+
+    @Transactional()
+    public void removeCompany(RemoveJoinCompanyDTO removeCompany, HttpSession session) {
+        String sessionUserIdStr = (String) session.getAttribute("userId");
+        UUID sessionUserId = UUID.fromString(sessionUserIdStr);
+
+        this.findUserOrThrowUseCase.byId(sessionUserId);
+        this.findUserOrThrowUseCase.byId(removeCompany.getUserId());
+
+        this.checkUserInCompanyUseCase.exist(sessionUserId, removeCompany.getCompanyId());
+        this.checkUserInCompanyUseCase.exist(removeCompany.getUserId(), removeCompany.getCompanyId());
+
+
     }
 }
 
