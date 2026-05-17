@@ -4,7 +4,7 @@ import com.load.balance.application.dtos.company.CreateCompanyDTO;
 import com.load.balance.application.dtos.company.JoinCompanyDTO;
 import com.load.balance.application.exceptions.users.UserNotFoundException;
 import com.load.balance.application.shared.SlugGenerator;
-import com.load.balance.application.usecase.companies.AddMemberAtCompany;
+import com.load.balance.application.usecase.companies.MemberAtCompany;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
@@ -35,7 +35,7 @@ class CompanyServicesTest {
     @Mock private CompanyRepository companyRepository;
     @Mock private SlugGenerator slugGenerator;
     @Mock private FindUserOrThrowUseCase findUserOrThrowUseCase;
-    @Mock private AddMemberAtCompany addMemberAtCompany;
+    @Mock private MemberAtCompany memberAtCompany;
     @Mock private FindCompanyOrThrowUseCase findCompanyOrThrowUseCase;
     @Mock private CheckUserInCompanyUseCase checkUserInCompanyUseCase;
     @Mock private HttpSession session;
@@ -90,7 +90,7 @@ class CompanyServicesTest {
         assertThat(result.getStatus()).isEqualTo(StatusCompany.ACTIVE);
 
         verify(companyRepository).save(any(Company.class));
-        verify(addMemberAtCompany).execute(eq(mockCompany), eq(mockUser));
+        verify(memberAtCompany).add(eq(mockCompany), eq(mockUser));
     }
 
     @Test
@@ -141,7 +141,7 @@ class CompanyServicesTest {
 
         companyServices.joinCompany(new JoinCompanyDTO(targetUserId, companyId), session);
 
-        verify(addMemberAtCompany).execute(eq(mockCompany), eq(targetUser));
+        verify(memberAtCompany).add(eq(mockCompany), eq(targetUser));
     }
 
     @Test
@@ -162,7 +162,7 @@ class CompanyServicesTest {
         ).isInstanceOf(RuntimeException.class)
                 .hasMessage("User is not a member of the company");
 
-        verify(addMemberAtCompany, never()).execute(any(), any());
+        verify(memberAtCompany, never()).add(any(), any());
     }
 
     @Test
@@ -190,7 +190,7 @@ class CompanyServicesTest {
         ).isInstanceOf(RuntimeException.class)
                 .hasMessage("User is already a member of the company");
 
-        verify(addMemberAtCompany, never()).execute(any(), any());
+        verify(memberAtCompany, never()).add(any(), any());
     }
 
     @Test
