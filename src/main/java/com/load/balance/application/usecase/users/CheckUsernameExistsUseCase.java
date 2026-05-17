@@ -1,5 +1,7 @@
 package com.load.balance.application.usecase.users;
 
+import com.load.balance.application.exceptions.users.UserAlreadyExists;
+import com.load.balance.application.exceptions.users.UserNotFoundException;
 import com.load.balance.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,14 +18,14 @@ public class CheckUsernameExistsUseCase {
         this.userRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.info("User with username {} not found", username);
-                    return new RuntimeException("User not found");
+                    return new UserNotFoundException();
                 });
     }
 
     public void notExist(String username) {
         this.userRepository.findByUsername(username).ifPresent(user -> {;
             log.info("User with username {} already exists", username);
-            throw new RuntimeException("User already exists");
+            throw new UserAlreadyExists();
         });
     }
 }
