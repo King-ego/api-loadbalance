@@ -26,7 +26,7 @@ public class Member {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
-    private Company company;
+    private Companies company;
 
     private Integer points;
     private LocalDateTime joinedAt;
