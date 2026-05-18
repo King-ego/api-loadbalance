@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Company {
+public class Companies {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
