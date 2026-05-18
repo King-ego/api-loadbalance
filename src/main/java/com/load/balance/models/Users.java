@@ -40,7 +40,7 @@ public class Users {
 
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Company> companies;
+    private List<Companies> companies;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -49,7 +49,7 @@ public class Users {
             inverseJoinColumns = @JoinColumn(name = "company_id")
     )
     @JsonIgnore
-    private List<Company> memberOf;
+    private List<Companies> memberOf;
 
     @PrePersist
     public void prePersist() {
