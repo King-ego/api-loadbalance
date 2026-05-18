@@ -32,7 +32,7 @@ public class Task {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
-    private Company company;
+    private Companies company;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
