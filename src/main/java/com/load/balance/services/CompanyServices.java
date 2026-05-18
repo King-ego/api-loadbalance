@@ -9,7 +9,7 @@ import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
 import com.load.balance.enums.StatusCompany;
-import com.load.balance.models.Company;
+import com.load.balance.models.Companies;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.CompanyRepository;
 import jakarta.servlet.http.HttpSession;
@@ -47,21 +47,21 @@ public class CompanyServices {
     }
 
     @Transactional(readOnly = true)
-    public List<Company> findBySlug(String slug, HttpSession session) {
+    public List<Companies> findBySlug(String slug, HttpSession session) {
         String sessionUserIdStr = (String) session.getAttribute("userId");
         UUID sessionUserId = UUID.fromString(sessionUserIdStr);
         return companyRepository.companiesBySlug(slug, sessionUserId);
     }
 
     @Transactional()
-    public Company createCompany(CreateCompanyDTO newCompany, HttpSession session) {
+    public Companies createCompany(CreateCompanyDTO newCompany, HttpSession session) {
         String sessionUserIdStr = (String) session.getAttribute("userId");
         UUID sessionUserId = UUID.fromString(sessionUserIdStr);
 
         Users creator = this.findUserOrThrowUseCase.byId(sessionUserId);
         String slug = this.slugGenerator.generate(newCompany.getName());
 
-        Company company = Company.builder()
+        Companies company = Companies.builder()
                 .name(newCompany.getName())
                 .description(newCompany.getDescription())
                 .status(StatusCompany.ACTIVE)
@@ -69,7 +69,7 @@ public class CompanyServices {
                 .createdBy(creator)
                 .build();
 
-        Company createCompany =  companyRepository.save(company);
+        Companies createCompany =  companyRepository.save(company);
 
         this.memberAtCompany.add(createCompany, creator);
 
@@ -83,7 +83,7 @@ public class CompanyServices {
 
         this.findUserOrThrowUseCase.byId(sessionUserId);
         Users addUser = this.findUserOrThrowUseCase.byId(joinCompany.getUserId());
-        Company company = this.findCompanyOrThrowUseCase.byId(joinCompany.getCompanyId());
+        Companies company = this.findCompanyOrThrowUseCase.byId(joinCompany.getCompanyId());
 
         this.checkUserInCompanyUseCase.exist(sessionUserId, joinCompany.getCompanyId());
         this.checkUserInCompanyUseCase.notExist(joinCompany.getUserId(), joinCompany.getCompanyId());
@@ -99,7 +99,7 @@ public class CompanyServices {
         this.findUserOrThrowUseCase.byId(sessionUserId);
 
         Users removeUser = this.findUserOrThrowUseCase.byId(removeCompany.getUserId());
-        Company company = this.findCompanyOrThrowUseCase.byId(removeCompany.getCompanyId());
+        Companies company = this.findCompanyOrThrowUseCase.byId(removeCompany.getCompanyId());
 
         this.checkUserInCompanyUseCase.exist(sessionUserId, removeCompany.getCompanyId());
         this.checkUserInCompanyUseCase.exist(removeCompany.getUserId(), removeCompany.getCompanyId());
