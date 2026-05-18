@@ -3,7 +3,7 @@ package com.load.balance.controllers;
 import com.load.balance.application.dtos.company.CreateCompanyDTO;
 import com.load.balance.application.dtos.company.JoinCompanyDTO;
 import com.load.balance.application.dtos.company.RemoveJoinCompanyDTO;
-import com.load.balance.models.Company;
+import com.load.balance.models.Companies;
 import com.load.balance.services.CompanyServices;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +20,12 @@ public class CompanyController {
     }
 
     @GetMapping
-    public List<Company> getCompanies(@RequestParam String slug, HttpSession session) {
+    public List<Companies> getCompanies(@RequestParam String slug, HttpSession session) {
         return this.companyServices.findBySlug(slug, session);
     }
 
     @PostMapping
-    public Company createCompany(@RequestBody CreateCompanyDTO company, HttpSession session) {
+    public Companies createCompany(@RequestBody CreateCompanyDTO company, HttpSession session) {
         return this.companyServices.createCompany(company, session);
     }
 
