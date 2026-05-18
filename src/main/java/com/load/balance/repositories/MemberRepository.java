@@ -1,6 +1,6 @@
 package com.load.balance.repositories;
 
-import com.load.balance.models.Company;
+import com.load.balance.models.Companies;
 import com.load.balance.models.Member;
 import com.load.balance.models.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,5 +20,5 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
     @Modifying
     @Transactional
     @Query("DELETE FROM Member m WHERE m.company = :company AND m.user = :user")
-    void deleteByCompanyAndUser(Company company, Users user);
+    void deleteByCompanyAndUser(Companies company, Users user);
 }
