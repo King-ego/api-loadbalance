@@ -1,6 +1,6 @@
 package com.load.balance.application.usecase.companies;
 
-import com.load.balance.models.Company;
+import com.load.balance.models.Companies;
 import com.load.balance.repositories.CompanyRepository;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ public class FindCompanyOrThrowUseCase {
         this.companyRepository = companyRepository;
     }
 
-    public Company byId(UUID companyId) {
+    public Companies byId(UUID companyId) {
         return this.companyRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("Company not found"));
     }
