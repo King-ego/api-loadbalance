@@ -1,6 +1,6 @@
 package com.load.balance.application.usecase.companies;
 
-import com.load.balance.models.Company;
+import com.load.balance.models.Companies;
 import com.load.balance.models.Member;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.MemberRepository;
@@ -16,7 +16,7 @@ public class MemberAtCompany {
         this.memberRepository = memberRepository;
     }
 
-    public void add(Company company, Users user) {
+    public void add(Companies company, Users user) {
         Member  member = Member.builder()
                 .user(user)
                 .roleInCompany("CREATOR")
@@ -28,7 +28,7 @@ public class MemberAtCompany {
         this.memberRepository.save(member);
     }
 
-    public void remove(Company company, Users user) {
+    public void remove(Companies company, Users user) {
         this.memberRepository.deleteByCompanyAndUser(company, user);
     }
 
