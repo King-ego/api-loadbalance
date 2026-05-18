@@ -9,7 +9,7 @@ import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
 import com.load.balance.enums.StatusCompany;
-import com.load.balance.models.Company;
+import com.load.balance.models.Companies;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.CompanyRepository;
 import jakarta.servlet.http.HttpSession;
@@ -46,7 +46,7 @@ class CompanyServicesTest {
     private UUID userId;
     private Users mockUser;
     private Users mockSessionUser;
-    private Company mockCompany;
+    private Companies mockCompany;
 
     @BeforeEach
     void setUp() {
@@ -64,7 +64,7 @@ class CompanyServicesTest {
                 .password("encoded")
                 .build();
 
-        mockCompany = Company.builder()
+        mockCompany = Companies.builder()
                 .name("Test Company")
                 .description("A test company")
                 .slug("test-company-abc123")
@@ -79,9 +79,9 @@ class CompanyServicesTest {
         when(session.getAttribute("userId")).thenReturn(userId.toString());
         when(findUserOrThrowUseCase.byId(userId)).thenReturn(mockUser);
         when(slugGenerator.generate("Test Company")).thenReturn("test-company-abc123");
-        when(companyRepository.save(any(Company.class))).thenReturn(mockCompany);
+        when(companyRepository.save(any(Companies.class))).thenReturn(mockCompany);
 
-        Company result = companyServices.createCompany(
+        Companies result = companyServices.createCompany(
                 new CreateCompanyDTO("Test Company", "A test company"), session
         );
 
@@ -89,7 +89,7 @@ class CompanyServicesTest {
         assertThat(result.getName()).isEqualTo("Test Company");
         assertThat(result.getStatus()).isEqualTo(StatusCompany.ACTIVE);
 
-        verify(companyRepository).save(any(Company.class));
+        verify(companyRepository).save(any(Companies.class));
         verify(memberAtCompany).add(eq(mockCompany), eq(mockUser));
     }
 
@@ -200,7 +200,7 @@ class CompanyServicesTest {
         when(session.getAttribute("userId")).thenReturn(userId.toString());
         when(companyRepository.companiesBySlug(eq(slug), any())).thenReturn(List.of(mockCompany));
 
-        List<Company> result = companyServices.findBySlug(slug, session);
+        List<Companies> result = companyServices.findBySlug(slug, session);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getName()).isEqualTo("Test Company");
@@ -212,7 +212,7 @@ class CompanyServicesTest {
         when(session.getAttribute("userId")).thenReturn(userId.toString());
         when(companyRepository.companiesBySlug(any(), any())).thenReturn(List.of());
 
-        List<Company> result = companyServices.findBySlug("nao-existe", session);
+        List<Companies> result = companyServices.findBySlug("nao-existe", session);
 
         assertThat(result).isEmpty();
     }
