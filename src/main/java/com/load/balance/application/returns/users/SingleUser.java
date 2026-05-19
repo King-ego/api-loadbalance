@@ -1,5 +1,6 @@
 package com.load.balance.application.returns.users;
 
+import com.load.balance.enums.UserRoles;
 import com.load.balance.models.Users;
 
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.util.UUID;
 public record SingleUser(
     UUID id,
     String username,
-    String role,
+    UserRoles role,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) implements Serializable {
