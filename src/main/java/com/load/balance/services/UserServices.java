@@ -5,6 +5,7 @@ import com.load.balance.application.returns.users.SingleUser;
 import com.load.balance.application.usecase.users.CheckEmailUseCase;
 import com.load.balance.application.usecase.users.CheckUsernameExistsUseCase;
 import com.load.balance.application.usecase.users.ValidatePasswordUseCase;
+import com.load.balance.enums.UserRoles;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,7 @@ public class UserServices {
                 .username(createUserDto.getUsername())
                 .password(passwordEncoder.encode(createUserDto.getPassword()))
                 .email(createUserDto.getEmail())
+                .role(UserRoles.MEMBER)
                 .build();
 
         this.userRepository.save(user);
