@@ -2,6 +2,7 @@ package com.load.balance.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.load.balance.enums.UserRoles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +37,7 @@ public class Users {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private String role;
+    private UserRoles role;
 
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
     @JsonIgnore
