@@ -1,5 +1,6 @@
 package com.load.balance.application.usecase.companies;
 
+import com.load.balance.enums.CompanyMemberRoles;
 import com.load.balance.models.Companies;
 import com.load.balance.models.Member;
 import com.load.balance.models.Users;
@@ -16,10 +17,10 @@ public class MemberAtCompany {
         this.memberRepository = memberRepository;
     }
 
-    public void add(Companies company, Users user) {
+    public void add(Companies company, Users user, CompanyMemberRoles role) {
         Member  member = Member.builder()
                 .user(user)
-                .roleInCompany("CREATOR")
+                .roleInCompany(role)
                 .points(0)
                 .company(company)
                 .joinedAt(LocalDateTime.now())
