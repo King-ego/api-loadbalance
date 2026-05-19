@@ -8,6 +8,7 @@ import com.load.balance.application.usecase.companies.MemberAtCompany;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
+import com.load.balance.enums.CompanyMemberRoles;
 import com.load.balance.enums.StatusCompany;
 import com.load.balance.models.Companies;
 import com.load.balance.models.Users;
@@ -90,7 +91,7 @@ class CompanyServicesTest {
         assertThat(result.getStatus()).isEqualTo(StatusCompany.ACTIVE);
 
         verify(companyRepository).save(any(Companies.class));
-        verify(memberAtCompany).add(eq(mockCompany), eq(mockUser));
+        verify(memberAtCompany).add(eq(mockCompany), eq(mockUser), CompanyMemberRoles.COMPANY_ADMIN);
     }
 
     @Test
@@ -141,7 +142,7 @@ class CompanyServicesTest {
 
         companyServices.joinCompany(new JoinCompanyDTO(targetUserId, companyId), session);
 
-        verify(memberAtCompany).add(eq(mockCompany), eq(targetUser));
+        verify(memberAtCompany).add(eq(mockCompany), eq(targetUser), CompanyMemberRoles.COMPANY_MEMBER);
     }
 
     @Test
@@ -162,7 +163,7 @@ class CompanyServicesTest {
         ).isInstanceOf(RuntimeException.class)
                 .hasMessage("User is not a member of the company");
 
-        verify(memberAtCompany, never()).add(any(), any());
+        verify(memberAtCompany, never()).add(any(), any(), any());
     }
 
     @Test
@@ -190,7 +191,7 @@ class CompanyServicesTest {
         ).isInstanceOf(RuntimeException.class)
                 .hasMessage("User is already a member of the company");
 
-        verify(memberAtCompany, never()).add(any(), any());
+        verify(memberAtCompany, never()).add(any(), any(), any());
     }
 
     @Test
