@@ -8,6 +8,7 @@ import com.load.balance.application.usecase.companies.MemberAtCompany;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
+import com.load.balance.enums.CompanyMemberRoles;
 import com.load.balance.enums.StatusCompany;
 import com.load.balance.models.Companies;
 import com.load.balance.models.Users;
@@ -71,7 +72,7 @@ public class CompanyServices {
 
         Companies createCompany =  companyRepository.save(company);
 
-        this.memberAtCompany.add(createCompany, creator);
+        this.memberAtCompany.add(createCompany, creator, CompanyMemberRoles.COMPANY_ADMIN);
 
         return createCompany;
     }
@@ -88,7 +89,7 @@ public class CompanyServices {
         this.checkUserInCompanyUseCase.exist(sessionUserId, joinCompany.getCompanyId());
         this.checkUserInCompanyUseCase.notExist(joinCompany.getUserId(), joinCompany.getCompanyId());
 
-        this.memberAtCompany.add(company, addUser);
+        this.memberAtCompany.add(company, addUser, CompanyMemberRoles.COMPANY_MEMBER);
     }
 
     @Transactional()
