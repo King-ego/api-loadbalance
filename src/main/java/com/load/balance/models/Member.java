@@ -1,5 +1,6 @@
 package com.load.balance.models;
 
+import com.load.balance.enums.CompanyMemberRoles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,5 +31,5 @@ public class Member {
 
     private Integer points;
     private LocalDateTime joinedAt;
-    private String roleInCompany;
+    private CompanyMemberRoles roleInCompany;
 }
