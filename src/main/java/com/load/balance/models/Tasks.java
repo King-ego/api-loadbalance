@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Task {
+public class Tasks {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
