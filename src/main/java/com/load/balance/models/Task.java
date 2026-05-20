@@ -39,6 +39,10 @@ public class Task {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id")
+    private Users createdBy;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
