@@ -107,7 +107,6 @@ public class CompanyServices {
 
         this.memberAtCompany.remove(company, removeUser);
 
-
     }
 }
 
