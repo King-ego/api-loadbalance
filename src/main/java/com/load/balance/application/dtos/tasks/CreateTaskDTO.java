@@ -20,9 +20,9 @@ public class CreateTaskDTO {
 
     private Integer priority;
 
-    private UUID company_id;
+    private UUID companyId;
 
-    private UUID member_id;
+    private UUID memberId;
 
     private int completedIn;
 
