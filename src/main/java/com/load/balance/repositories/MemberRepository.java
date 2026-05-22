@@ -21,4 +21,7 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
     @Transactional
     @Query("DELETE FROM Member m WHERE m.company = :company AND m.user = :user")
     void deleteByCompanyAndUser(Companies company, Users user);
+
+    @Query("SELECT m FROM Member m WHERE m.user.id = :userId AND m.company.id = :companyId")
+    Optional<Member> findMemberByUserIdAndCompanyId(UUID userId, UUID companyId);
 }
