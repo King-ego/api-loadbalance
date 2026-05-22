@@ -1,9 +1,11 @@
 package com.load.balance.services;
 
 import com.load.balance.application.dtos.tasks.CreateTaskDTO;
+import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
 import com.load.balance.models.Companies;
+import com.load.balance.models.Member;
 import com.load.balance.models.Tasks;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.TaskRepository;
@@ -19,10 +21,12 @@ public class TaskServices {
     private final TaskRepository taskRepository;
     private final FindUserOrThrowUseCase findUserOrThrowUseCase;
     private final FindCompanyOrThrowUseCase findCompanyOrThrowUseCase;
-    public TaskServices(TaskRepository taskRepository,  FindUserOrThrowUseCase findUserOrThrowUseCase,  FindCompanyOrThrowUseCase findCompanyOrThrowUseCase) {
+    private final CheckUserInCompanyUseCase checkUserInCompanyUseCase;
+    public TaskServices(TaskRepository taskRepository,  FindUserOrThrowUseCase findUserOrThrowUseCase,  FindCompanyOrThrowUseCase findCompanyOrThrowUseCase, CheckUserInCompanyUseCase checkUserInCompanyUseCase) {
         this.taskRepository = taskRepository;
         this.findUserOrThrowUseCase = findUserOrThrowUseCase;
         this.findCompanyOrThrowUseCase = findCompanyOrThrowUseCase;
+        this.checkUserInCompanyUseCase = checkUserInCompanyUseCase;
 
     }
 
@@ -33,10 +37,11 @@ public class TaskServices {
         Users user = this.findUserOrThrowUseCase.byId(sessionUserId);
         this.findCompanyOrThrowUseCase.byId(createTaskDTO.getCompanyId());
 
-
+        Member member = this.checkUserInCompanyUseCase.getMember(createTaskDTO.getUserId(), createTaskDTO.getCompanyId());
 
         Tasks tasks = Tasks.builder()
                 .createdBy(user)
+                .member(member)
                 .build();
 
         this.taskRepository.save(tasks);
