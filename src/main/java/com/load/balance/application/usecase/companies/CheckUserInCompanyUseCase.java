@@ -24,4 +24,5 @@ public class CheckUserInCompanyUseCase {
                     throw new RuntimeException("User is already a member of the company");
                 });
     }
+
 }
