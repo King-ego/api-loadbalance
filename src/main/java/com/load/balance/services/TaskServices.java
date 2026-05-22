@@ -3,6 +3,9 @@ package com.load.balance.services;
 import com.load.balance.application.dtos.tasks.CreateTaskDTO;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
+import com.load.balance.models.Companies;
+import com.load.balance.models.Tasks;
+import com.load.balance.models.Users;
 import com.load.balance.repositories.TaskRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +30,16 @@ public class TaskServices {
         String sessionUserIdStr = (String) session.getAttribute("userId");
         UUID sessionUserId = UUID.fromString(sessionUserIdStr);
 
-        this.findUserOrThrowUseCase.byId(sessionUserId);
+        Users user = this.findUserOrThrowUseCase.byId(sessionUserId);
         this.findCompanyOrThrowUseCase.byId(createTaskDTO.getCompanyId());
+
+
+
+        Tasks tasks = Tasks.builder()
+                .createdBy(user)
+                .build();
+
+        this.taskRepository.save(tasks);
 
         return "Create Task";
     }
