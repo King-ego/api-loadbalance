@@ -1,5 +1,6 @@
 package com.load.balance.application.usecase.companies;
 
+import com.load.balance.models.Member;
 import com.load.balance.repositories.MemberRepository;
 import org.springframework.stereotype.Component;
 
@@ -24,5 +25,8 @@ public class CheckUserInCompanyUseCase {
                     throw new RuntimeException("User is already a member of the company");
                 });
     }
-
+    public Member getMember(UUID userId, UUID companyId) {
+        return this.memberRepository.findMemberByUserIdAndCompanyId(userId, companyId)
+                .orElseThrow(() -> new RuntimeException("User is not a member of the company"));
+    }
 }
