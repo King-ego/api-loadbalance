@@ -29,10 +29,10 @@ public class Tasks {
 
     private Integer priority;
 
-    @JsonIgnore
+  /*  @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
-    private Companies company;
+    private Companies company;*/
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
