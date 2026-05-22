@@ -22,7 +22,7 @@ public class CreateTaskDTO {
 
     private UUID companyId;
 
-    private UUID memberId;
+    private UUID userId;
 
     private int completedIn;
 
