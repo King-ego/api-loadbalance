@@ -9,3 +9,4 @@ import java.util.UUID;
 @Repository
 public interface PenaltyRepository extends JpaRepository<Penalty, UUID> {
 }
+
