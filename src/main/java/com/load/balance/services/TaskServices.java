@@ -42,6 +42,10 @@ public class TaskServices {
         Tasks tasks = Tasks.builder()
                 .createdBy(user)
                 .member(member)
+                .name(createTaskDTO.getName())
+                .description(createTaskDTO.getDescription())
+                .status(createTaskDTO.getStatus())
+                .priority(createTaskDTO.getPriority())
                 .build();
 
         this.taskRepository.save(tasks);
