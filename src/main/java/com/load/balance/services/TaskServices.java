@@ -13,6 +13,8 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -39,6 +41,8 @@ public class TaskServices {
 
         Member member = this.checkUserInCompanyUseCase.getMember(createTaskDTO.getUserId(), createTaskDTO.getCompanyId());
 
+        LocalDateTime completedAt = createTaskDTO.getStartedAt().plusDays(createTaskDTO.getCompletedIn());
+
         Tasks tasks = Tasks.builder()
                 .createdBy(user)
                 .member(member)
@@ -46,6 +50,8 @@ public class TaskServices {
                 .description(createTaskDTO.getDescription())
                 .status(createTaskDTO.getStatus())
                 .priority(createTaskDTO.getPriority())
+                .completedIn(createTaskDTO.getCompletedIn())
+                .completedAt(completedAt)
                 .build();
 
         this.taskRepository.save(tasks);
