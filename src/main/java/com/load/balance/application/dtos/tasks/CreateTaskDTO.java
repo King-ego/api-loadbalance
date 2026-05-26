@@ -1,6 +1,6 @@
 package com.load.balance.application.dtos.tasks;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -27,5 +27,5 @@ public class CreateTaskDTO {
     private int completedIn;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate startedAt;
+    private LocalDateTime startedAt;
 }
