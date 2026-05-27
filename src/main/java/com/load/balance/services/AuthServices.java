@@ -4,10 +4,12 @@ import com.load.balance.application.dtos.auth.CreateLoginDefault;
 import com.load.balance.application.returns.users.SingleUser;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
 import com.load.balance.models.Users;
+import com.load.balance.security.AuthenticatedUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -33,34 +35,51 @@ public class AuthServices {
     }
 
     @Transactional(readOnly = true)
-    public SingleUser authenticateDefault(CreateLoginDefault loginDefault, HttpSession session) {
-        Users user = this.findUserOrThrowUseCase.byEmail(loginDefault.getEmail());
+    public SingleUser authenticateDefault(
+            CreateLoginDefault loginDefault,
+            HttpSession session
+    ) {
+        Users user = this.findUserOrThrowUseCase
+                .byEmail(loginDefault.getEmail());
 
-        if (!passwordEncoder.matches(loginDefault.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(
+                loginDefault.getPassword(),
+                user.getPassword()
+        )) {
             throw new RuntimeException("Invalid password");
         }
 
+        AuthenticatedUser principal =
+                new AuthenticatedUser(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getRole()
+                );
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
-                        user.getEmail(),
+                        principal,
                         null,
-                        List.of(new SimpleGrantedAuthority("MEMBER"))
+                        principal.getAuthorities()
                 );
 
-        SecurityContextImpl securityContext = new SecurityContextImpl(authentication);
-        SecurityContextHolder.setContext(securityContext);
+        SecurityContext context =
+                SecurityContextHolder.createEmptyContext();
+
+        context.setAuthentication(authentication);
+
+        SecurityContextHolder.setContext(context);
 
         session.setAttribute(
-                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                securityContext
+                HttpSessionSecurityContextRepository
+                        .SPRING_SECURITY_CONTEXT_KEY,
+                context
         );
-        session.setAttribute("userId", user.getId().toString());
-        session.setAttribute("userRole", "MEMBER");
+
         session.setMaxInactiveInterval(1800);
 
-
         log.info("User authenticated: {}", user.getUsername());
+
         return SingleUser.from(user);
     }
 
