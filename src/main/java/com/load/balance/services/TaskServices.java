@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -39,9 +40,11 @@ public class TaskServices {
         Users user = this.findUserOrThrowUseCase.byId(sessionUserId);
         this.findCompanyOrThrowUseCase.byId(createTaskDTO.getCompanyId());
 
+        int plusDays = Optional.of(createTaskDTO.getCompletedIn()).orElse(0);
+
         Member member = this.checkUserInCompanyUseCase.getMember(createTaskDTO.getUserId(), createTaskDTO.getCompanyId());
 
-        LocalDateTime completedAt = createTaskDTO.getStartedAt().plusDays(createTaskDTO.getCompletedIn());
+        LocalDateTime completedAt = createTaskDTO.getStartedAt().plusDays(plusDays);
 
         Tasks tasks = Tasks.builder()
                 .createdBy(user)
