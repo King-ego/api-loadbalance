@@ -14,8 +14,6 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-/*import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;*/
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
