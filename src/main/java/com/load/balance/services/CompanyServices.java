@@ -3,6 +3,7 @@ package com.load.balance.services;
 import com.load.balance.application.dtos.company.CreateCompanyDTO;
 import com.load.balance.application.dtos.company.JoinCompanyDTO;
 import com.load.balance.application.dtos.company.RemoveJoinCompanyDTO;
+import com.load.balance.application.helpers.auth.AuthHelper;
 import com.load.balance.application.shared.SlugGenerator;
 import com.load.balance.application.usecase.companies.MemberAtCompany;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
@@ -30,6 +31,7 @@ public class CompanyServices {
     private final MemberAtCompany memberAtCompany;
     private final FindCompanyOrThrowUseCase findCompanyOrThrowUseCase;
     private final CheckUserInCompanyUseCase checkUserInCompanyUseCase;
+    private final AuthHelper authHelper;
 
     public CompanyServices(
             CompanyRepository companyRepository,
@@ -37,7 +39,8 @@ public class CompanyServices {
             FindUserOrThrowUseCase findUserOrThrowUseCase,
             MemberAtCompany memberAtCompany,
             FindCompanyOrThrowUseCase findCompanyOrThrowUseCase,
-            CheckUserInCompanyUseCase checkUserInCompanyUseCase
+            CheckUserInCompanyUseCase checkUserInCompanyUseCase,
+            AuthHelper authHelper
     ) {
         this.companyRepository = companyRepository;
         this.slugGenerator = slugGenerator;
@@ -45,6 +48,7 @@ public class CompanyServices {
         this.memberAtCompany = memberAtCompany;
         this.findCompanyOrThrowUseCase = findCompanyOrThrowUseCase;
         this.checkUserInCompanyUseCase = checkUserInCompanyUseCase;
+        this.authHelper = authHelper;
     }
 
     @Transactional(readOnly = true)
@@ -56,10 +60,9 @@ public class CompanyServices {
 
     @Transactional()
     public Companies createCompany(CreateCompanyDTO newCompany, HttpSession session) {
-        String sessionUserIdStr = (String) session.getAttribute("userId");
-        UUID sessionUserId = UUID.fromString(sessionUserIdStr);
+        Users creator = authHelper.getSessionUser();
 
-        Users creator = this.findUserOrThrowUseCase.byId(sessionUserId);
+        /*Users creator = this.findUserOrThrowUseCase.byId(sessionUserId);*/
         String slug = this.slugGenerator.generate(newCompany.getName());
 
         Companies company = Companies.builder()
