@@ -2,9 +2,12 @@ package com.load.balance.controllers;
 
 import com.load.balance.application.dtos.auth.CreateLoginDefault;
 import com.load.balance.application.returns.users.SingleUser;
+import com.load.balance.security.AuthenticatedUser;
 import com.load.balance.services.AuthServices;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,7 +32,7 @@ public class AuthController {
         authServices.logout(session);
     }
 
-    @GetMapping("/me")
+    /*@GetMapping("/me")
     public Map<String, Object> me(HttpSession session) {
         String userId = (String) session.getAttribute("userId");
         String userRole = (String) session.getAttribute("userRole");
@@ -43,5 +46,11 @@ public class AuthController {
                 "role", userRole,
                 "sessionId", session.getId()
         );
+    }*/
+    @GetMapping("/me")
+    public ResponseEntity<?> me(
+            @AuthenticationPrincipal AuthenticatedUser user
+    ) {
+        return ResponseEntity.ok(user);
     }
 }
