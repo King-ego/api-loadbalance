@@ -61,5 +61,9 @@ public class TaskServices {
 
         return "Create Task";
     }
+
+    public String update(){
+        return "Update Task";
+    }
 }
 
