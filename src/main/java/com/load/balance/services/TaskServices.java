@@ -1,6 +1,7 @@
 package com.load.balance.services;
 
 import com.load.balance.application.dtos.tasks.CreateTaskDTO;
+import com.load.balance.application.dtos.tasks.UpdateTaskDTO;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
@@ -62,7 +63,7 @@ public class TaskServices {
         return "Create Task";
     }
 
-    public String update(){
+    public String update(UpdateTaskDTO updateTaskDTO, HttpSession session) {
         return "Update Task";
     }
 }
