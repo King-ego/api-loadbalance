@@ -5,6 +5,7 @@ import com.load.balance.application.returns.users.SingleUser;
 import com.load.balance.application.usecase.users.CheckEmailUseCase;
 import com.load.balance.application.usecase.users.CheckUsernameExistsUseCase;
 import com.load.balance.application.usecase.users.DeleteUserUseCase;
+import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
 import com.load.balance.application.usecase.users.ValidatePasswordUseCase;
 import com.load.balance.enums.UserRoles;
 import com.load.balance.models.Users;
@@ -28,6 +29,7 @@ public class UserServices {
     private final CheckUsernameExistsUseCase checkUsernameExistsUseCase;
     private final ValidatePasswordUseCase validatePasswordUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
+    private final FindUserOrThrowUseCase findUserOrThrowUseCase;
 
     public UserServices(
             UserRepository userRepository,
@@ -35,7 +37,8 @@ public class UserServices {
             CheckUsernameExistsUseCase checkUsernameExistsUseCase,
             CheckEmailUseCase checkEmailUseCase,
             ValidatePasswordUseCase validatePasswordUseCase,
-            DeleteUserUseCase deleteUserUseCase
+            DeleteUserUseCase deleteUserUseCase,
+            FindUserOrThrowUseCase findUserOrThrowUseCase
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -43,6 +46,7 @@ public class UserServices {
         this.checkEmailUseCase = checkEmailUseCase;
         this.validatePasswordUseCase = validatePasswordUseCase;
         this.deleteUserUseCase = deleteUserUseCase;
+        this.findUserOrThrowUseCase = findUserOrThrowUseCase;
     }
 
     @CacheEvict(value = "users", allEntries = true)
@@ -87,7 +91,8 @@ public class UserServices {
     @CacheEvict(value = "users", allEntries = true)
     @Transactional
     public void deleteUser(UUID userId) {
-        this.deleteUserUseCase.execute(userId);
+        Users user = this.findUserOrThrowUseCase.byId(userId);
+        this.deleteUserUseCase.execute(user);
         log.info("User deleted: {}", userId);
     }
 }
