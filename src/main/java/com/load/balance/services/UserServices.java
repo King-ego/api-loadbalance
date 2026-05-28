@@ -4,6 +4,7 @@ import com.load.balance.application.dtos.users.CreateUserDto;
 import com.load.balance.application.returns.users.SingleUser;
 import com.load.balance.application.usecase.users.CheckEmailUseCase;
 import com.load.balance.application.usecase.users.CheckUsernameExistsUseCase;
+import com.load.balance.application.usecase.users.DeleteUserUseCase;
 import com.load.balance.application.usecase.users.ValidatePasswordUseCase;
 import com.load.balance.enums.UserRoles;
 import com.load.balance.models.Users;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -25,19 +27,22 @@ public class UserServices {
     private final CheckEmailUseCase checkEmailUseCase;
     private final CheckUsernameExistsUseCase checkUsernameExistsUseCase;
     private final ValidatePasswordUseCase validatePasswordUseCase;
+    private final DeleteUserUseCase deleteUserUseCase;
 
     public UserServices(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             CheckUsernameExistsUseCase checkUsernameExistsUseCase,
             CheckEmailUseCase checkEmailUseCase,
-            ValidatePasswordUseCase validatePasswordUseCase
+            ValidatePasswordUseCase validatePasswordUseCase,
+            DeleteUserUseCase deleteUserUseCase
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.checkUsernameExistsUseCase = checkUsernameExistsUseCase;
         this.checkEmailUseCase = checkEmailUseCase;
         this.validatePasswordUseCase = validatePasswordUseCase;
+        this.deleteUserUseCase = deleteUserUseCase;
     }
 
     @CacheEvict(value = "users", allEntries = true)
@@ -77,5 +82,12 @@ public class UserServices {
         return users.stream()
                 .map(SingleUser::from)
                 .toList();
+    }
+
+    @CacheEvict(value = "users", allEntries = true)
+    @Transactional
+    public void deleteUser(UUID userId) {
+        this.deleteUserUseCase.execute(userId);
+        log.info("User deleted: {}", userId);
     }
 }
