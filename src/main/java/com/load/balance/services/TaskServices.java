@@ -5,7 +5,6 @@ import com.load.balance.application.dtos.tasks.UpdateTaskDTO;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
-import com.load.balance.models.Companies;
 import com.load.balance.models.Member;
 import com.load.balance.models.Tasks;
 import com.load.balance.models.Users;
@@ -14,7 +13,6 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
