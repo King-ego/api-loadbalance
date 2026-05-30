@@ -1,9 +1,12 @@
 package com.load.balance.controllers;
 
 import com.load.balance.application.dtos.tasks.CreateTaskDTO;
+import com.load.balance.application.dtos.tasks.UpdateTaskDTO;
+import com.load.balance.models.Tasks;
 import com.load.balance.services.TaskServices;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +19,14 @@ public class TaskController {
     TaskController(TaskServices taskServices){
         this.taskServices = taskServices;
     }
+
     @PostMapping
-    public String createTask(@RequestBody CreateTaskDTO  createTaskDTO, HttpSession session) {
+    public String createTask(@RequestBody CreateTaskDTO createTaskDTO, HttpSession session) {
         return this.taskServices.createTask(createTaskDTO, session);
+    }
+
+    @PutMapping
+    public Tasks updateTask(@RequestBody UpdateTaskDTO updateTaskDTO, HttpSession session) {
+        return this.taskServices.update(updateTaskDTO, session);
     }
 }
