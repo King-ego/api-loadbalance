@@ -16,4 +16,3 @@ public class Penalty {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 }
-
