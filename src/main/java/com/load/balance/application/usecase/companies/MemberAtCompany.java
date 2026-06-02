@@ -32,5 +32,4 @@ public class MemberAtCompany {
     public void remove(Companies company, Users user) {
         this.memberRepository.deleteByCompanyAndUser(company, user);
     }
-
 }
