@@ -100,10 +100,11 @@ public class CompanyServices {
 
     @Transactional()
     public void removeCompany(RemoveJoinCompanyDTO removeCompany, HttpSession session) {
-        String sessionUserIdStr = (String) session.getAttribute("userId");
+        /*String sessionUserIdStr = (String) session.getAttribute("userId");
         UUID sessionUserId = UUID.fromString(sessionUserIdStr);
 
-        this.findUserOrThrowUseCase.byId(sessionUserId);
+        this.findUserOrThrowUseCase.byId(sessionUserId);*/
+        UUID sessionUserId =  authHelper.getAuthenticatedUserId();
 
         Users removeUser = this.findUserOrThrowUseCase.byId(removeCompany.getUserId());
         Companies company = this.findCompanyOrThrowUseCase.byId(removeCompany.getCompanyId());
