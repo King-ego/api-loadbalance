@@ -53,8 +53,9 @@ public class CompanyServices {
 
     @Transactional(readOnly = true)
     public List<Companies> findBySlug(String slug, HttpSession session) {
-        String sessionUserIdStr = (String) session.getAttribute("userId");
-        UUID sessionUserId = UUID.fromString(sessionUserIdStr);
+        /*String sessionUserIdStr = (String) session.getAttribute("userId");
+        UUID sessionUserId = UUID.fromString(sessionUserIdStr);*/
+        UUID sessionUserId = authHelper.getAuthenticatedUserId();
         return companyRepository.companiesBySlug(slug, sessionUserId);
     }
 
