@@ -76,10 +76,12 @@ public class TaskServices {
     }
 
     public Tasks update(UpdateTaskDTO updateTaskDTO, HttpSession session) {
-        String sessionUserIdStr = (String) session.getAttribute("userId");
+        /*String sessionUserIdStr = (String) session.getAttribute("userId");
         UUID sessionUserId = UUID.fromString(sessionUserIdStr);
 
-        this.findUserOrThrowUseCase.byId(sessionUserId);
+        this.findUserOrThrowUseCase.byId(sessionUserId);*/
+
+        authHelper.getSessionUser();
 
         Tasks task = this.findTaskOrThrowUseCase.byId(updateTaskDTO.getTaskId());
 
