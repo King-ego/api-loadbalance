@@ -2,6 +2,7 @@ package com.load.balance.services;
 
 import com.load.balance.application.dtos.tasks.CreateTaskDTO;
 import com.load.balance.application.dtos.tasks.UpdateTaskDTO;
+import com.load.balance.application.helpers.auth.AuthHelper;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.tasks.FindTaskOrThrowUseCase;
@@ -26,26 +27,30 @@ public class TaskServices {
     private final FindCompanyOrThrowUseCase findCompanyOrThrowUseCase;
     private final CheckUserInCompanyUseCase checkUserInCompanyUseCase;
     private final FindTaskOrThrowUseCase findTaskOrThrowUseCase;
+    private final AuthHelper authHelper;
 
     public TaskServices(
             TaskRepository taskRepository,
             FindUserOrThrowUseCase findUserOrThrowUseCase,
             FindCompanyOrThrowUseCase findCompanyOrThrowUseCase,
             CheckUserInCompanyUseCase checkUserInCompanyUseCase,
-            FindTaskOrThrowUseCase findTaskOrThrowUseCase
+            FindTaskOrThrowUseCase findTaskOrThrowUseCase,
+            AuthHelper authHelper
     ) {
         this.taskRepository = taskRepository;
         this.findUserOrThrowUseCase = findUserOrThrowUseCase;
         this.findCompanyOrThrowUseCase = findCompanyOrThrowUseCase;
         this.checkUserInCompanyUseCase = checkUserInCompanyUseCase;
         this.findTaskOrThrowUseCase = findTaskOrThrowUseCase;
+        this.authHelper = authHelper;
     }
 
     public String createTask(CreateTaskDTO createTaskDTO, HttpSession session) {
-        String sessionUserIdStr = (String) session.getAttribute("userId");
+        /*String sessionUserIdStr = (String) session.getAttribute("userId");
         UUID sessionUserId = UUID.fromString(sessionUserIdStr);
 
-        Users user = this.findUserOrThrowUseCase.byId(sessionUserId);
+        Users user = this.findUserOrThrowUseCase.byId(sessionUserId);*/
+        Users creator = authHelper.getSessionUser();
         this.findCompanyOrThrowUseCase.byId(createTaskDTO.getCompanyId());
 
         int plusDays = Optional.of(createTaskDTO.getCompletedIn()).orElse(0);
@@ -55,7 +60,7 @@ public class TaskServices {
         LocalDateTime completedAt = createTaskDTO.getStartedAt().plusDays(plusDays);
 
         Tasks tasks = Tasks.builder()
-                .createdBy(user)
+                .createdBy(creator)
                 .member(member)
                 .name(createTaskDTO.getName())
                 .description(createTaskDTO.getDescription())
