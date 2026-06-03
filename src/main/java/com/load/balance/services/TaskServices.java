@@ -95,5 +95,7 @@ public class TaskServices {
         return this.taskRepository.save(task);
     }
 
-    public void concludeTask(UUID taskId, HttpSession session) {}
+    public void concludeTask(UUID taskId) {
+        authHelper.getSessionUser();
+    }
 }
