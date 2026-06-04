@@ -41,6 +41,11 @@ public class Tasks {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name= "company_id")
+    private Companies company;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id")
     private Users createdBy;
