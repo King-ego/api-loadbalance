@@ -3,10 +3,10 @@ package com.load.balance.services;
 import com.load.balance.application.dtos.tasks.CreateTaskDTO;
 import com.load.balance.application.dtos.tasks.UpdateTaskDTO;
 import com.load.balance.application.helpers.auth.AuthHelper;
+import com.load.balance.application.shared.CompareDate;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.tasks.FindTaskOrThrowUseCase;
-import com.load.balance.application.usecase.users.FindUserOrThrowUseCase;
 import com.load.balance.models.Member;
 import com.load.balance.models.Tasks;
 import com.load.balance.models.Users;
@@ -23,7 +23,6 @@ import java.util.UUID;
 @Service
 public class TaskServices {
     private final TaskRepository taskRepository;
-    private final FindUserOrThrowUseCase findUserOrThrowUseCase;
     private final FindCompanyOrThrowUseCase findCompanyOrThrowUseCase;
     private final CheckUserInCompanyUseCase checkUserInCompanyUseCase;
     private final FindTaskOrThrowUseCase findTaskOrThrowUseCase;
@@ -31,14 +30,12 @@ public class TaskServices {
 
     public TaskServices(
             TaskRepository taskRepository,
-            FindUserOrThrowUseCase findUserOrThrowUseCase,
             FindCompanyOrThrowUseCase findCompanyOrThrowUseCase,
             CheckUserInCompanyUseCase checkUserInCompanyUseCase,
             FindTaskOrThrowUseCase findTaskOrThrowUseCase,
             AuthHelper authHelper
     ) {
         this.taskRepository = taskRepository;
-        this.findUserOrThrowUseCase = findUserOrThrowUseCase;
         this.findCompanyOrThrowUseCase = findCompanyOrThrowUseCase;
         this.checkUserInCompanyUseCase = checkUserInCompanyUseCase;
         this.findTaskOrThrowUseCase = findTaskOrThrowUseCase;
@@ -55,7 +52,7 @@ public class TaskServices {
 
         int plusDays = Optional.of(createTaskDTO.getCompletedIn()).orElse(0);
 
-        Member member = this.checkUserInCompanyUseCase.getMember(createTaskDTO.getUserId(), createTaskDTO.getCompanyId());
+        Member member = checkUserInCompanyUseCase.getMember(createTaskDTO.getUserId(), createTaskDTO.getCompanyId());
 
         LocalDateTime completedAt = createTaskDTO.getStartedAt().plusDays(plusDays);
 
@@ -70,7 +67,7 @@ public class TaskServices {
                 .completedAt(completedAt)
                 .build();
 
-        this.taskRepository.save(tasks);
+        taskRepository.save(tasks);
 
         return "Create Task";
     }
@@ -83,7 +80,7 @@ public class TaskServices {
 
         authHelper.getSessionUser();
 
-        Tasks task = this.findTaskOrThrowUseCase.byId(updateTaskDTO.getTaskId());
+        Tasks task = findTaskOrThrowUseCase.byId(updateTaskDTO.getTaskId());
 
         if (updateTaskDTO.getName() != null) task.setName(updateTaskDTO.getName());
         if (updateTaskDTO.getDescription() != null) task.setDescription(updateTaskDTO.getDescription());
@@ -92,10 +89,16 @@ public class TaskServices {
         if (updateTaskDTO.getCompletedIn() != null) task.setCompletedIn(updateTaskDTO.getCompletedIn());
         if (updateTaskDTO.getCompletedAt() != null) task.setCompletedAt(updateTaskDTO.getCompletedAt());
 
-        return this.taskRepository.save(task);
+        return taskRepository.save(task);
     }
 
     public void concludeTask(UUID taskId) {
-        authHelper.getSessionUser();
+        Users user = authHelper.getSessionUser();
+        Tasks task = findTaskOrThrowUseCase.byId(taskId);
+
+        findCompanyOrThrowUseCase.byId(task.getCompany().getId());
+        checkUserInCompanyUseCase.exist(user.getId(), task.getCompany().getId());
+
+        CompareDate.after(task.getCompletedAt(), LocalDateTime.now());
     }
 }
