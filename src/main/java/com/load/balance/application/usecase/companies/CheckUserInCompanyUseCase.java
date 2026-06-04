@@ -14,13 +14,13 @@ public class CheckUserInCompanyUseCase {
         this.memberRepository = memberRepository;
     }
 
-    public void exist(UUID userId, UUID memberId) {
-        this.memberRepository.findByUserIdAndCompanyId(userId, memberId)
+    public void exist(UUID userId, UUID companyId) {
+        this.memberRepository.findByUserIdAndCompanyId(userId, companyId)
                 .orElseThrow(() -> new RuntimeException("User is not a member of the company"));
     }
 
-    public void notExist(UUID userId, UUID memberId) {
-        this.memberRepository.findByUserIdAndCompanyId(userId, memberId)
+    public void notExist(UUID userId, UUID companyId) {
+        this.memberRepository.findByUserIdAndCompanyId(userId, companyId)
                 .ifPresent(member -> {
                     throw new RuntimeException("User is already a member of the company");
                 });
