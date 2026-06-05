@@ -8,8 +8,11 @@ import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.tasks.FindTaskOrThrowUseCase;
 import com.load.balance.models.Member;
+import com.load.balance.models.Penalty;
 import com.load.balance.models.Tasks;
 import com.load.balance.models.Users;
+import com.load.balance.repositories.MemberRepository;
+import com.load.balance.repositories.PenaltyRepository;
 import com.load.balance.repositories.TaskRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -27,19 +30,25 @@ public class TaskServices {
     private final CheckUserInCompanyUseCase checkUserInCompanyUseCase;
     private final FindTaskOrThrowUseCase findTaskOrThrowUseCase;
     private final AuthHelper authHelper;
+    private final PenaltyRepository penaltyRepository;
+    private final MemberRepository memberRepository;
 
     public TaskServices(
             TaskRepository taskRepository,
             FindCompanyOrThrowUseCase findCompanyOrThrowUseCase,
             CheckUserInCompanyUseCase checkUserInCompanyUseCase,
             FindTaskOrThrowUseCase findTaskOrThrowUseCase,
-            AuthHelper authHelper
+            AuthHelper authHelper,
+            PenaltyRepository penaltyRepository,
+            MemberRepository memberRepository
     ) {
         this.taskRepository = taskRepository;
         this.findCompanyOrThrowUseCase = findCompanyOrThrowUseCase;
         this.checkUserInCompanyUseCase = checkUserInCompanyUseCase;
         this.findTaskOrThrowUseCase = findTaskOrThrowUseCase;
         this.authHelper = authHelper;
+        this.penaltyRepository = penaltyRepository;
+        this.memberRepository = memberRepository;
     }
 
     public String createTask(CreateTaskDTO createTaskDTO, HttpSession session) {
@@ -97,8 +106,28 @@ public class TaskServices {
         Tasks task = findTaskOrThrowUseCase.byId(taskId);
 
         findCompanyOrThrowUseCase.byId(task.getCompany().getId());
-        checkUserInCompanyUseCase.exist(user.getId(), task.getCompany().getId());
+        Member member = checkUserInCompanyUseCase.getMember(user.getId(), task.getCompany().getId());
 
-        boolean afterDate = new CompareDate().after(task.getCompletedAt(), LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        boolean onTime = new CompareDate().after(task.getCompletedAt(), now);
+
+        task.setStatus("CONCLUDED");
+        task.setConcludedAt(now);
+        taskRepository.save(task);
+
+        if (onTime) {
+            int weight = task.getPriority() != null ? task.getPriority() : 1;
+            member.setPoints(member.getPoints() + weight);
+            memberRepository.save(member);
+            log.info("Member {} earned {} point(s) for concluding task {} on time", member.getId(), weight, taskId);
+        } else {
+            Penalty penalty = Penalty.builder()
+                    .member(member)
+                    .task(task)
+                    .reason("Task concluded after deadline")
+                    .build();
+            penaltyRepository.save(penalty);
+            log.info("Penalty registered for member {} on task {} (concluded late)", member.getId(), taskId);
+        }
     }
 }
