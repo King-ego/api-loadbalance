@@ -55,6 +55,7 @@ public class Tasks {
 
     private int completedIn;
     private LocalDateTime completedAt;
+    private LocalDateTime concludedAt;
 
     @PrePersist
     protected void onCreate() {
