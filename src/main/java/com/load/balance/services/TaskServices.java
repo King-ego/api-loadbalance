@@ -99,6 +99,6 @@ public class TaskServices {
         findCompanyOrThrowUseCase.byId(task.getCompany().getId());
         checkUserInCompanyUseCase.exist(user.getId(), task.getCompany().getId());
 
-        CompareDate.after(task.getCompletedAt(), LocalDateTime.now());
+        boolean afterDate = new CompareDate().after(task.getCompletedAt(), LocalDateTime.now());
     }
 }
