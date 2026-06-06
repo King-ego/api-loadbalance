@@ -7,6 +7,7 @@ import com.load.balance.models.Users;
 import com.load.balance.repositories.MemberRepository;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Component
@@ -22,6 +23,7 @@ public class MemberAtCompany {
                 .user(user)
                 .roleInCompany(role)
                 .points(0)
+                .balance(BigDecimal.ZERO)
                 .company(company)
                 .joinedAt(LocalDateTime.now())
                 .build();
