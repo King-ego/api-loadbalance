@@ -7,24 +7,32 @@ import com.load.balance.application.shared.CompareDate;
 import com.load.balance.application.usecase.companies.CheckUserInCompanyUseCase;
 import com.load.balance.application.usecase.companies.FindCompanyOrThrowUseCase;
 import com.load.balance.application.usecase.tasks.FindTaskOrThrowUseCase;
+import com.load.balance.enums.TransactionType;
 import com.load.balance.models.Member;
 import com.load.balance.models.Penalty;
 import com.load.balance.models.Tasks;
+import com.load.balance.models.Transaction;
 import com.load.balance.models.Users;
 import com.load.balance.repositories.MemberRepository;
 import com.load.balance.repositories.PenaltyRepository;
 import com.load.balance.repositories.TaskRepository;
+import com.load.balance.repositories.TransactionRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @Service
 public class TaskServices {
+
+    private static final BigDecimal PENALTY_RATE_PER_DAY = new BigDecimal("50.00");
+
     private final TaskRepository taskRepository;
     private final FindCompanyOrThrowUseCase findCompanyOrThrowUseCase;
     private final CheckUserInCompanyUseCase checkUserInCompanyUseCase;
@@ -32,6 +40,7 @@ public class TaskServices {
     private final AuthHelper authHelper;
     private final PenaltyRepository penaltyRepository;
     private final MemberRepository memberRepository;
+    private final TransactionRepository transactionRepository;
 
     public TaskServices(
             TaskRepository taskRepository,
@@ -40,7 +49,8 @@ public class TaskServices {
             FindTaskOrThrowUseCase findTaskOrThrowUseCase,
             AuthHelper authHelper,
             PenaltyRepository penaltyRepository,
-            MemberRepository memberRepository
+            MemberRepository memberRepository,
+            TransactionRepository transactionRepository
     ) {
         this.taskRepository = taskRepository;
         this.findCompanyOrThrowUseCase = findCompanyOrThrowUseCase;
@@ -49,6 +59,7 @@ public class TaskServices {
         this.authHelper = authHelper;
         this.penaltyRepository = penaltyRepository;
         this.memberRepository = memberRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     public String createTask(CreateTaskDTO createTaskDTO, HttpSession session) {
@@ -121,13 +132,41 @@ public class TaskServices {
             memberRepository.save(member);
             log.info("Member {} earned {} point(s) for concluding task {} on time", member.getId(), weight, taskId);
         } else {
-            Penalty penalty = Penalty.builder()
-                    .member(member)
-                    .task(task)
-                    .reason("Task concluded after deadline")
-                    .build();
-            penaltyRepository.save(penalty);
-            log.info("Penalty registered for member {} on task {} (concluded late)", member.getId(), taskId);
+            applyFinancialPenalty(member, task, now);
         }
+    }
+
+    private void applyFinancialPenalty(Member member, Tasks task, LocalDateTime now) {
+        long daysLate = ChronoUnit.DAYS.between(task.getCompletedAt(), now);
+        if (daysLate < 1) daysLate = 1;
+
+        BigDecimal penaltyAmount = PENALTY_RATE_PER_DAY.multiply(BigDecimal.valueOf(daysLate));
+        BigDecimal balanceBefore = member.getBalance() != null ? member.getBalance() : BigDecimal.ZERO;
+        BigDecimal balanceAfter = balanceBefore.subtract(penaltyAmount);
+
+        member.setBalance(balanceAfter);
+        memberRepository.save(member);
+
+        Transaction transaction = Transaction.builder()
+                .member(member)
+                .type(TransactionType.DEBIT)
+                .amount(penaltyAmount)
+                .balanceBefore(balanceBefore)
+                .balanceAfter(balanceAfter)
+                .description(String.format("Late penalty: %d day(s) overdue on task '%s'", daysLate, task.getName()))
+                .build();
+        transactionRepository.save(transaction);
+
+        Penalty penalty = Penalty.builder()
+                .member(member)
+                .task(task)
+                .reason("Task concluded after deadline")
+                .amount(penaltyAmount)
+                .daysLate((int) daysLate)
+                .build();
+        penaltyRepository.save(penalty);
+
+        log.info("Financial penalty of {} applied to member {} ({} day(s) late on task {})",
+                penaltyAmount, member.getId(), daysLate, task.getId());
     }
 }
