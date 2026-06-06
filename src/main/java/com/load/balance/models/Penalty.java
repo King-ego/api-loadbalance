@@ -3,6 +3,7 @@ package com.load.balance.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -26,6 +27,10 @@ public class Penalty {
     private Tasks task;
 
     private String reason;
+
+    private BigDecimal amount;
+
+    private int daysLate;
 
     private LocalDateTime createdAt;
 
