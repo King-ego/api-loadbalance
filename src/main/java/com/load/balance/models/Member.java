@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -32,6 +33,7 @@ public class Member {
     private Companies company;
 
     private Integer points;
+    private BigDecimal balance;
     private LocalDateTime joinedAt;
     private CompanyMemberRoles roleInCompany;
 }
