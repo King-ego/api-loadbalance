@@ -15,3 +15,4 @@ public class CompareDate {
         return date1.isEqual(date2);
     }
 }
+
