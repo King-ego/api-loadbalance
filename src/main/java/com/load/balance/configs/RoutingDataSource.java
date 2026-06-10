@@ -10,3 +10,4 @@ public class RoutingDataSource extends AbstractRoutingDataSource {
         return (type != null) ? type : DataSourceType.WRITE;
     }
 }
+
