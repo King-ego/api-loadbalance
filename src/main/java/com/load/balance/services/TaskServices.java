@@ -170,4 +170,3 @@ public class TaskServices {
                 penaltyAmount, member.getId(), daysLate, task.getId());
     }
 }
-
