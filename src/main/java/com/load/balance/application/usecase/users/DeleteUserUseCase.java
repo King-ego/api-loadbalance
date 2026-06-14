@@ -20,3 +20,4 @@ public class DeleteUserUseCase {
         log.info("User deleted: {}", user.getId());
     }
 }
+
