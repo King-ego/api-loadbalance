@@ -17,4 +17,9 @@ public class FindCompanyOrThrowUseCase {
         return this.companyRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("Company not found"));
     }
+
+    public Companies byCreatorId(UUID creatorId) {
+        return  companyRepository.findByCreatorId(creatorId)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+    }
 }
