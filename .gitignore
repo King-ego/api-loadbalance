@@ -25,7 +25,6 @@ target/
 /nbproject/private/
 /nbbuild/
 /dist/
-/httproutes/
 /nbdist/
 /.nb-gradle/
 build/
