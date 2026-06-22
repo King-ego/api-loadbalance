@@ -30,3 +30,4 @@ public class CheckUserInCompanyUseCase {
                 .orElseThrow(() -> new RuntimeException("User is not a member of the company"));
     }
 }
+
