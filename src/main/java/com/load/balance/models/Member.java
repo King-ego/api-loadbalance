@@ -37,3 +37,4 @@ public class Member {
     private LocalDateTime joinedAt;
     private CompanyMemberRoles roleInCompany;
 }
+
