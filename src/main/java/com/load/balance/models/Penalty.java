@@ -39,3 +39,4 @@ public class Penalty {
         createdAt = LocalDateTime.now();
     }
 }
+
