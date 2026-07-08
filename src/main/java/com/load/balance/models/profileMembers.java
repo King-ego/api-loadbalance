@@ -19,4 +19,3 @@ public class profileMembers {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 }
-
