@@ -17,4 +17,3 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 }
-
