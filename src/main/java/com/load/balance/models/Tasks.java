@@ -67,4 +67,3 @@ public class Tasks {
         updatedAt = LocalDateTime.now();
     }
 }
-
