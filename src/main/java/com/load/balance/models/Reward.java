@@ -19,4 +19,3 @@ public class Reward {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 }
-
