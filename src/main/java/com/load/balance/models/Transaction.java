@@ -44,4 +44,3 @@ public class Transaction {
         createdAt = LocalDateTime.now();
     }
 }
-
