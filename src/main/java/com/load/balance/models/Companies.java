@@ -48,4 +48,3 @@ public class Companies {
         updatedAt = LocalDateTime.now();
     }
 }
-
