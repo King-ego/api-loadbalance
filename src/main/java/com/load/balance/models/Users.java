@@ -62,4 +62,3 @@ public class Users {
         this.updatedAt = LocalDateTime.now();
     }
 }
-
