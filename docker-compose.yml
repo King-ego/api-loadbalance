@@ -120,7 +120,11 @@ services:
       - ./loki/loki-config.yaml:/etc/loki/local-config.yaml
       - loki_data:/loki
     command: -config.file=/etc/loki/local-config.yaml
-
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:3100/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   prometheus:
     image: prom/prometheus:v2.52.0
     container_name: prometheus
@@ -167,6 +171,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      loki:
+        condition: service_healthy
 
   api-server-2:
     build:
@@ -187,6 +193,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      loki:
+        condition: service_healthy
 
   api-server-3:
     build:
@@ -206,6 +214,8 @@ services:
       pgbouncer:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      loki:
         condition: service_healthy
 
 volumes:
