@@ -111,9 +111,9 @@ services:
       - api-server-2
       - api-server-3
 
-  loki:
+  loki-api:
     image: grafana/loki:3.0.0
-    container_name: loki
+    container_name: loki-api
     ports:
       - "3100:3100"
     volumes:
@@ -150,7 +150,7 @@ services:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
     depends_on:
-      - loki
+      - loki-api
 
   api-server-1:
     build:
@@ -171,7 +171,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      loki:
+      loki-api:
         condition: service_healthy
 
   api-server-2:
@@ -193,7 +193,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      loki:
+      loki-api:
         condition: service_healthy
 
   api-server-3:
@@ -215,7 +215,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      loki:
+      loki-api:
         condition: service_healthy
 
 volumes:
